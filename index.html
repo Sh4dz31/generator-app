@@ -293,6 +293,12 @@
     margin-bottom: 14px;
   }
   .diesel-alert svg { width: 16px; height: 16px; color: var(--warning); flex-shrink: 0; margin-top: 1px; }
+  .diesel-alert.info { background: var(--info-soft); border-color: var(--info-border); }
+  .diesel-alert.info svg { color: var(--info); }
+  .diesel-alert.success { background: var(--success-soft); border-color: var(--success-border); }
+  .diesel-alert.success svg { color: var(--success); }
+  .diesel-alert.danger { background: var(--danger-soft); border-color: var(--danger-border); }
+  .diesel-alert.danger svg { color: var(--danger); }
   .diesel-alert-text { font-size: 12px; line-height: 1.45; }
   .diesel-alert-text strong { font-weight: 600; }
   .diesel-rows {
@@ -714,6 +720,105 @@
   }
   .reading-label { color: var(--text-muted); }
   .reading-val { font-family: 'Geist Mono', monospace; font-weight: 500; }
+
+  /* ANOMALY BANNER */
+  .anomaly-alert {
+    background: var(--warning-soft);
+    border: 1px solid var(--warning-border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    margin-bottom: 12px;
+  }
+  .anomaly-alert svg { width: 18px; height: 18px; color: var(--warning); flex-shrink: 0; margin-top: 1px; }
+  .anomaly-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+  .anomaly-text { font-size: 12px; line-height: 1.45; color: var(--text-muted); }
+  .anomaly-text strong { color: var(--text); font-weight: 600; }
+
+  /* STATUS / DISPUTE */
+  .status-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0 12px;
+  }
+  .status-current { font-size: 13px; color: var(--text-muted); }
+  .btn-ghost {
+    width: 100%;
+    background: transparent;
+    border: 1px dashed var(--border-strong);
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 12px;
+    font-weight: 500;
+    font-family: inherit;
+    color: var(--text-muted);
+    cursor: pointer;
+    margin-top: 10px;
+  }
+  .btn-ghost:active { background: var(--surface-2); }
+  .btn-ghost.warn { color: var(--warning); border-color: var(--warning-border); }
+
+  /* METER PHOTO PLACEHOLDER */
+  .meter-photo { margin-top: 6px; }
+  .meter-photo-label { font-size: 11px; color: var(--text-faint); font-family: 'Geist Mono', monospace; margin-bottom: 6px; }
+  .meter-photo-frame {
+    background: #1c1917;
+    border: 1px solid var(--border-strong);
+    border-radius: 10px;
+    padding: 22px 16px;
+    text-align: center;
+  }
+  .meter-digits {
+    font-family: 'Geist Mono', monospace;
+    font-size: 34px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: #fbbf24;
+    background: #0c0a09;
+    border-radius: 6px;
+    padding: 8px 12px;
+    display: inline-block;
+  }
+  .meter-unit { font-size: 11px; color: #a8a29e; font-family: 'Geist Mono', monospace; margin-top: 8px; }
+
+  /* TECHNICAL NOTES */
+  .note-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+  .note-item {
+    background: var(--surface-2);
+    border-radius: 8px;
+    padding: 10px 12px;
+  }
+  .note-date { font-size: 10px; color: var(--text-faint); font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 3px; }
+  .note-text { font-size: 13px; line-height: 1.4; }
+  .note-empty { font-size: 12px; color: var(--text-faint); padding: 4px 0 12px; }
+  .note-add { display: flex; gap: 8px; }
+  .note-add input {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 13px;
+    font-family: inherit;
+    color: var(--text);
+    outline: none;
+  }
+  .note-add input:focus { border-color: var(--text-muted); }
+  .note-add-btn {
+    background: var(--text);
+    color: var(--bg);
+    border: none;
+    border-radius: 8px;
+    padding: 0 16px;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
 </style>
 </head>
 <body>
@@ -793,9 +898,9 @@
       </div>
 
       <div class="diesel-card">
-        <div class="diesel-alert">
+        <div class="diesel-alert" id="dieselAlert">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-          <div class="diesel-alert-text">Diesel up <strong>8%</strong> this week. Your rate hasn't moved — every dollar of diesel is eating into your margin. Recalculate to see where you stand.</div>
+          <div class="diesel-alert-text" id="dieselAlertText">Margin slipped to <strong>24%</strong> this month, from 28% in October. Update this month's diesel cost to see where you stand.</div>
         </div>
         <div class="diesel-rows">
           <div class="diesel-row"><span class="diesel-row-label">Diesel cost (Nov)</span><span class="diesel-row-value" id="dieselCostDisplay">$19,010</span></div>
@@ -1059,14 +1164,14 @@
   const VAT = 0.11;
   const tierFee = { '5A': 4.30, '10A': 7.80, '15A': 11.50 };
   const subscribers = {
-    ziad:   { name:'Ziad Hourani', initials:'ZH', meter:'PAF 142', tier:'10A', addr:'Bldg Saade, Fl 3', prev:4820, curr:5008, status:'paid', method:'Whish', date:'Nov 22' },
-    rania:  { name:'Rania Khoury', initials:'RK', meter:'PAF 078', tier:'5A', addr:'Bldg Antoun, Fl 1', prev:2140, curr:2236, status:'pending', method:null, date:'bill sent Nov 19' },
-    elie:   { name:'Elie Mansour', initials:'EM', meter:'PAF 203', tier:'15A', addr:'Bldg Najjar, Fl 2', prev:7610, curr:7982, status:'disputed', method:null, date:'photo attached' },
-    marwan: { name:'Marwan Saliba', initials:'MS', meter:'PAF 019', tier:'5A', addr:'Bldg Geara, Fl 4', prev:3300, curr:3404, status:'paid', method:'Cash', date:'Nov 18' },
-    joseph: { name:'Joseph Daher', initials:'JD', meter:'PAF 251', tier:'10A', addr:'Bldg Akiki, Fl 1', prev:5940, curr:6155, status:'overdue', method:null, date:'overdue 2 months' },
-    nada:   { name:'Nada Abi Rached', initials:'NR', meter:'PAF 114', tier:'5A', addr:'Bldg Tueni, Fl 5', prev:1860, curr:1928, status:'paid', method:'Visa', date:'Nov 24' },
-    sami:   { name:'Sami Geagea', initials:'SG', meter:'PAF 087', tier:'10A', addr:'Bldg Rahme, Fl 2', prev:4100, curr:4252, status:'paid', method:'Whish', date:'Nov 23' },
-    layla:  { name:'Layla Frangieh', initials:'LF', meter:'PAF 166', tier:'5A', addr:'Bldg Sfeir, Fl 3', prev:2700, curr:2784, status:'pending', method:null, date:'bill sent Nov 20' },
+    ziad:   { name:'Ziad Hourani', initials:'ZH', meter:'PAF 142', tier:'10A', addr:'Bldg Saade, Fl 3', prev:4820, curr:5008, avgKwh:175, status:'paid', method:'Whish', date:'Nov 22', notes:[] },
+    rania:  { name:'Rania Khoury', initials:'RK', meter:'PAF 078', tier:'5A', addr:'Bldg Antoun, Fl 1', prev:2140, curr:2236, avgKwh:90, status:'pending', method:null, date:'bill sent Nov 19', notes:[] },
+    elie:   { name:'Elie Mansour', initials:'EM', meter:'PAF 203', tier:'15A', addr:'Bldg Najjar, Fl 2', prev:7610, curr:7982, avgKwh:124, status:'disputed', method:null, date:'photo attached', notes:[{date:'Oct 18', text:'Meter glass foggy — reader noted digits hard to read'}] },
+    marwan: { name:'Marwan Saliba', initials:'MS', meter:'PAF 019', tier:'5A', addr:'Bldg Geara, Fl 4', prev:3300, curr:3404, avgKwh:100, status:'paid', method:'Cash', date:'Nov 18', notes:[] },
+    joseph: { name:'Joseph Daher', initials:'JD', meter:'PAF 251', tier:'10A', addr:'Bldg Akiki, Fl 1', prev:5940, curr:6155, avgKwh:205, status:'overdue', method:null, date:'overdue 2 months', notes:[{date:'Nov 10', text:'Spoke in person — promised payment by Dec 1'}] },
+    nada:   { name:'Nada Abi Rached', initials:'NR', meter:'PAF 114', tier:'5A', addr:'Bldg Tueni, Fl 5', prev:1860, curr:1928, avgKwh:70, status:'paid', method:'Visa', date:'Nov 24', notes:[] },
+    sami:   { name:'Sami Geagea', initials:'SG', meter:'PAF 087', tier:'10A', addr:'Bldg Rahme, Fl 2', prev:4100, curr:4252, avgKwh:150, status:'paid', method:'Whish', date:'Nov 23', notes:[] },
+    layla:  { name:'Layla Frangieh', initials:'LF', meter:'PAF 166', tier:'5A', addr:'Bldg Sfeir, Fl 3', prev:2700, curr:2784, avgKwh:82, status:'pending', method:null, date:'bill sent Nov 20', notes:[] },
   };
   const statusLabel = { paid:'Paid', pending:'Pending', disputed:'Disputed', overdue:'Overdue · 2mo' };
 
@@ -1081,9 +1186,74 @@
     const vat = subtotal * VAT;
     const total = subtotal + vat;
 
+    // ---- Anomaly detection (needs the avgKwh baseline) ----
+    // Two triggers: reading rolled backward, or usage far above the rolling average.
+    let anomaly = null;
+    if (kwh < 0) {
+      anomaly = { kind:'rollback', text:'Current reading is <strong>lower</strong> than last month. Possible rollback, misread, or tampering — verify before sending.' };
+    } else if (s.avgKwh && kwh > s.avgKwh * 2) {
+      const mult = (kwh / s.avgKwh).toFixed(1);
+      anomaly = { kind:'spike', text:'Usage is <strong>' + mult + '\u00d7</strong> the 6-month average (' + s.avgKwh + ' kWh). Verify the reading before sending the bill.' };
+    }
+
     const paidLine = s.method
       ? `<div class="receipt-meta"><span>Paid via ${s.method}</span><span>${s.date}</span></div>`
       : `<div class="receipt-meta"><span>${statusLabel[s.status]}</span><span>${s.date}</span></div>`;
+
+    // Anomaly banner (only when flagged and not already resolved)
+    const anomalyBanner = (anomaly && s.status !== 'paid' && s.status !== 'resolved')
+      ? `<div class="anomaly-alert">
+           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+           <div><div class="anomaly-title">Reading flagged automatically</div><div class="anomaly-text">${anomaly.text}</div></div>
+         </div>`
+      : '';
+
+    // Status / dispute card
+    const isDisputed = s.status === 'disputed';
+    const disputeCard = `
+      <div class="receipt">
+        <div class="receipt-title">Status &amp; dispute</div>
+        <div class="status-row">
+          <span class="status-current">Current status</span>
+          <span class="sub-badge ${s.status}">${statusLabel[s.status]}</span>
+        </div>
+        ${isDisputed ? `
+          <div class="meter-photo" id="meterPhoto" style="display:none;">
+            <div class="meter-photo-label">Meter photo · captured ${s.date === 'photo attached' ? 'Nov 29, 08:14' : s.date}</div>
+            <div class="meter-photo-frame">
+              <div class="meter-digits">${s.curr.toLocaleString()}</div>
+              <div class="meter-unit">kWh · ${s.meter}</div>
+            </div>
+          </div>
+          <div class="detail-actions" style="margin-top:12px;">
+            <button class="toolbar-btn secondary" onclick="togglePhoto()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              View photo
+            </button>
+            <button class="toolbar-btn" onclick="resolveDispute('${id}','confirm')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              Confirm reading
+            </button>
+          </div>
+          <button class="btn-ghost" onclick="resolveDispute('${id}','adjust')">Adjust bill instead</button>
+        ` : `
+          <button class="btn-ghost warn" onclick="toggleDispute('${id}')">Flag as disputed</button>
+        `}
+      </div>`;
+
+    // Technical notes card
+    const notesList = (s.notes && s.notes.length)
+      ? s.notes.map(n => `<div class="note-item"><div class="note-date">${n.date}</div><div class="note-text">${n.text}</div></div>`).join('')
+      : `<div class="note-empty">No technical notes yet.</div>`;
+    const notesCard = `
+      <div class="receipt">
+        <div class="receipt-title">Technical notes</div>
+        <div class="note-list">${notesList}</div>
+        <div class="note-add">
+          <input type="text" id="noteInput" placeholder="Add a note — meter fault, supply issue, dispute cause…">
+          <button class="note-add-btn" onclick="addNote('${id}')">Add</button>
+        </div>
+      </div>`;
 
     const html = `
       <div class="detail-head">
@@ -1094,10 +1264,13 @@
         </div>
       </div>
 
+      ${anomalyBanner}
+
       <div class="receipt">
         <div class="receipt-title">Meter reading — November</div>
         <div class="reading-row"><span class="reading-label">Previous</span><span class="reading-val">${s.prev.toLocaleString()} kWh</span></div>
         <div class="reading-row"><span class="reading-label">Current</span><span class="reading-val">${s.curr.toLocaleString()} kWh</span></div>
+        <div class="reading-row"><span class="reading-label">6-month average</span><span class="reading-val">${s.avgKwh} kWh</span></div>
         <div class="receipt-divider"></div>
         <div class="reading-row"><span class="reading-label">Consumed</span><span class="reading-val">${kwh} kWh</span></div>
       </div>
@@ -1112,6 +1285,10 @@
         ${paidLine}
       </div>
 
+      ${disputeCard}
+
+      ${notesCard}
+
       <div class="detail-actions">
         <button class="toolbar-btn secondary">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
@@ -1124,7 +1301,37 @@
       </div>
     `;
     document.getElementById('detail-content').innerHTML = html;
+    document.getElementById('detail-content').dataset.current = id;
     showScreen('detail');
+  }
+
+  // ---- Dispute + notes actions (mutate in-memory state, then re-render) ----
+  function toggleDispute(id) {
+    subscribers[id].status = 'disputed';
+    showDetail(id);
+  }
+  function resolveDispute(id, action) {
+    const s = subscribers[id];
+    if (action === 'confirm') {
+      s.status = 'pending';
+      s.date = 'reading confirmed';
+    } else if (action === 'adjust') {
+      s.status = 'pending';
+      s.date = 'bill adjusted';
+      s.notes.unshift({ date:'Today', text:'Bill adjusted after dispute review' });
+    }
+    showDetail(id);
+  }
+  function togglePhoto() {
+    const p = document.getElementById('meterPhoto');
+    if (p) p.style.display = p.style.display === 'none' ? 'block' : 'none';
+  }
+  function addNote(id) {
+    const input = document.getElementById('noteInput');
+    const val = (input.value || '').trim();
+    if (!val) return;
+    subscribers[id].notes.unshift({ date:'Today', text: val });
+    showDetail(id);
   }
 
   // ---- Live rate engine ----
@@ -1163,6 +1370,23 @@
     const hint = document.getElementById('rateHint');
     hint.innerHTML = 'Margin at this rate: <strong>' + marginStr + '</strong> · cost floor $' + breakEven.toFixed(2) + '/kWh';
     hint.className = 'rate-hint' + (marginRounded <= 0 ? ' danger' : (marginRounded < 15 ? ' warn' : ''));
+
+    // dynamic notice — derived from operator's own month-over-month figures, no live price feed
+    const alert = document.getElementById('dieselAlert');
+    const alertText = document.getElementById('dieselAlertText');
+    if (marginRounded <= 0) {
+      alert.className = 'diesel-alert danger';
+      alertText.innerHTML = 'You\u2019re below break-even — your rate of $' + rate.toFixed(2) + ' doesn\u2019t cover your $' + breakEven.toFixed(2) + '/kWh cost. Raise your rate.';
+    } else if (delta < -1) {
+      alert.className = 'diesel-alert';
+      alertText.innerHTML = 'Margin slipped to <strong>' + marginStr + '</strong> this month, from ' + OCT_MARGIN + '% in October. Diesel cost is usually the cause — check your number.';
+    } else if (delta > 1) {
+      alert.className = 'diesel-alert success';
+      alertText.innerHTML = 'Margin recovered to <strong>' + marginStr + '</strong>, up from ' + OCT_MARGIN + '% in October. Update your diesel cost each month to stay ahead.';
+    } else {
+      alert.className = 'diesel-alert info';
+      alertText.innerHTML = 'Margin steady at <strong>' + marginStr + '</strong>. Update your diesel cost each month to catch changes early.';
+    }
   }
 
   document.getElementById('recalcBtn').addEventListener('click', () => {
@@ -1201,6 +1425,9 @@
       c.classList.add('active');
     });
   });
+
+  // Initialize the rate engine on load (keeps every value consistent from the start)
+  recalcRate();
 </script>
 </body>
 </html>
