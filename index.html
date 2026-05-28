@@ -819,6 +819,50 @@
     cursor: pointer;
     flex-shrink: 0;
   }
+
+  /* FIELD-VIEW BANNER & ROLE */
+  .field-banner {
+    display: none;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 20px;
+    background: var(--info-soft);
+    border-bottom: 1px solid var(--info-border);
+  }
+  .field-banner-left { display: flex; align-items: center; gap: 10px; }
+  .field-banner-left svg { width: 18px; height: 18px; color: var(--info); flex-shrink: 0; }
+  .field-banner-title { font-size: 13px; font-weight: 600; color: var(--info); }
+  .field-banner-sub { font-size: 11px; color: var(--text-muted); }
+  .field-banner-exit {
+    background: var(--info);
+    color: #fff;
+    border: none;
+    border-radius: 7px;
+    padding: 7px 14px;
+    font-size: 12px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .route-badge {
+    display: inline-block;
+    font-size: 10px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+  .route-badge.done { background: var(--success-soft); color: var(--success); border: 1px solid var(--success-border); }
+  .route-badge.todo { background: var(--surface-2); color: var(--text-muted); border: 1px solid var(--border-strong); }
+  .photo-status {
+    font-size: 13px;
+    color: var(--success);
+    font-weight: 500;
+    margin-top: 10px;
+  }
 </style>
 </head>
 <body>
@@ -835,6 +879,9 @@
       </div>
     </div>
     <div class="header-actions">
+      <button class="icon-btn" id="roleToggle" aria-label="Switch role" title="Switch to field view">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </button>
       <button class="icon-btn" id="themeToggle" aria-label="Toggle theme">
         <svg id="iconSun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
         <svg id="iconMoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
@@ -844,6 +891,18 @@
       </button>
     </div>
   </header>
+
+  <!-- FIELD-VIEW BANNER (meter reader role) -->
+  <div class="field-banner" id="fieldBanner">
+    <div class="field-banner-left">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+      <div>
+        <div class="field-banner-title">Field view · meter reader</div>
+        <div class="field-banner-sub">Readings &amp; photos only — no bills, no margins</div>
+      </div>
+    </div>
+    <button class="field-banner-exit" id="exitFieldBtn">Exit</button>
+  </div>
 
   <!-- CONTENT -->
   <main class="app-content">
@@ -1125,7 +1184,28 @@
       </div>
     </section>
 
+    <!-- FIELD: ROUTE SCREEN (meter reader) -->
+    <section class="screen" id="screen-route">
+      <h1 class="screen-title">Today's route</h1>
+      <p class="screen-subtitle" id="routeProgress">Ballouneh · 3 of 8 read</p>
+      <div class="search-bar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" placeholder="Find by name or meter number">
+      </div>
+      <div class="sub-list" id="route-list"></div>
+    </section>
+
+    <!-- FIELD: READING ENTRY SCREEN -->
+    <section class="screen" id="screen-reading">
+      <button class="back-btn" onclick="showScreen('route')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        Route
+      </button>
+      <div id="reading-content"></div>
+    </section>
+
   </main>
+
 
   <!-- BOTTOM NAV -->
   <nav class="bottom-nav">
@@ -1164,14 +1244,14 @@
   const VAT = 0.11;
   const tierFee = { '5A': 4.30, '10A': 7.80, '15A': 11.50 };
   const subscribers = {
-    ziad:   { name:'Ziad Hourani', initials:'ZH', meter:'PAF 142', tier:'10A', addr:'Bldg Saade, Fl 3', prev:4820, curr:5008, avgKwh:175, status:'paid', method:'Whish', date:'Nov 22', notes:[] },
-    rania:  { name:'Rania Khoury', initials:'RK', meter:'PAF 078', tier:'5A', addr:'Bldg Antoun, Fl 1', prev:2140, curr:2236, avgKwh:90, status:'pending', method:null, date:'bill sent Nov 19', notes:[] },
-    elie:   { name:'Elie Mansour', initials:'EM', meter:'PAF 203', tier:'15A', addr:'Bldg Najjar, Fl 2', prev:7610, curr:7982, avgKwh:124, status:'disputed', method:null, date:'photo attached', notes:[{date:'Oct 18', text:'Meter glass foggy — reader noted digits hard to read'}] },
-    marwan: { name:'Marwan Saliba', initials:'MS', meter:'PAF 019', tier:'5A', addr:'Bldg Geara, Fl 4', prev:3300, curr:3404, avgKwh:100, status:'paid', method:'Cash', date:'Nov 18', notes:[] },
-    joseph: { name:'Joseph Daher', initials:'JD', meter:'PAF 251', tier:'10A', addr:'Bldg Akiki, Fl 1', prev:5940, curr:6155, avgKwh:205, status:'overdue', method:null, date:'overdue 2 months', notes:[{date:'Nov 10', text:'Spoke in person — promised payment by Dec 1'}] },
-    nada:   { name:'Nada Abi Rached', initials:'NR', meter:'PAF 114', tier:'5A', addr:'Bldg Tueni, Fl 5', prev:1860, curr:1928, avgKwh:70, status:'paid', method:'Visa', date:'Nov 24', notes:[] },
-    sami:   { name:'Sami Geagea', initials:'SG', meter:'PAF 087', tier:'10A', addr:'Bldg Rahme, Fl 2', prev:4100, curr:4252, avgKwh:150, status:'paid', method:'Whish', date:'Nov 23', notes:[] },
-    layla:  { name:'Layla Frangieh', initials:'LF', meter:'PAF 166', tier:'5A', addr:'Bldg Sfeir, Fl 3', prev:2700, curr:2784, avgKwh:82, status:'pending', method:null, date:'bill sent Nov 20', notes:[] },
+    ziad:   { name:'Ziad Hourani', initials:'ZH', meter:'PAF 142', tier:'10A', addr:'Bldg Saade, Fl 3', prev:4820, curr:5008, avgKwh:175, status:'paid', method:'Whish', date:'Nov 22', notes:[], readToday:true },
+    rania:  { name:'Rania Khoury', initials:'RK', meter:'PAF 078', tier:'5A', addr:'Bldg Antoun, Fl 1', prev:2140, curr:2236, avgKwh:90, status:'pending', method:null, date:'bill sent Nov 19', notes:[], readToday:true },
+    elie:   { name:'Elie Mansour', initials:'EM', meter:'PAF 203', tier:'15A', addr:'Bldg Najjar, Fl 2', prev:7610, curr:7982, avgKwh:124, status:'disputed', method:null, date:'photo attached', notes:[{date:'Oct 18', text:'Meter glass foggy — reader noted digits hard to read'}], readToday:true },
+    marwan: { name:'Marwan Saliba', initials:'MS', meter:'PAF 019', tier:'5A', addr:'Bldg Geara, Fl 4', prev:3300, curr:3404, avgKwh:100, status:'paid', method:'Cash', date:'Nov 18', notes:[], readToday:false },
+    joseph: { name:'Joseph Daher', initials:'JD', meter:'PAF 251', tier:'10A', addr:'Bldg Akiki, Fl 1', prev:5940, curr:6155, avgKwh:205, status:'overdue', method:null, date:'overdue 2 months', notes:[{date:'Nov 10', text:'Spoke in person — promised payment by Dec 1'}], readToday:false },
+    nada:   { name:'Nada Abi Rached', initials:'NR', meter:'PAF 114', tier:'5A', addr:'Bldg Tueni, Fl 5', prev:1860, curr:1928, avgKwh:70, status:'paid', method:'Visa', date:'Nov 24', notes:[], readToday:false },
+    sami:   { name:'Sami Geagea', initials:'SG', meter:'PAF 087', tier:'10A', addr:'Bldg Rahme, Fl 2', prev:4100, curr:4252, avgKwh:150, status:'paid', method:'Whish', date:'Nov 23', notes:[], readToday:false },
+    layla:  { name:'Layla Frangieh', initials:'LF', meter:'PAF 166', tier:'5A', addr:'Bldg Sfeir, Fl 3', prev:2700, curr:2784, avgKwh:82, status:'pending', method:null, date:'bill sent Nov 20', notes:[], readToday:false },
   };
   const statusLabel = { paid:'Paid', pending:'Pending', disputed:'Disputed', overdue:'Overdue · 2mo' };
 
@@ -1333,6 +1413,94 @@
     subscribers[id].notes.unshift({ date:'Today', text: val });
     showDetail(id);
   }
+
+  // ---- Two-tier role access (SIMULATED view-switch, not real auth) ----
+  let role = 'admin';
+  function setRole(r) {
+    role = r;
+    const banner = document.getElementById('fieldBanner');
+    const nav = document.querySelector('.bottom-nav');
+    if (r === 'field') {
+      banner.style.display = 'flex';
+      nav.style.display = 'none';
+      renderRoute();
+      showScreen('route');
+    } else {
+      banner.style.display = 'none';
+      nav.style.display = 'flex';
+      showScreen('dashboard');
+    }
+  }
+
+  function renderRoute() {
+    const ids = Object.keys(subscribers);
+    const done = ids.filter(i => subscribers[i].readToday).length;
+    document.getElementById('routeProgress').textContent = 'Ballouneh · ' + done + ' of ' + ids.length + ' read';
+    const rows = ids.map(id => {
+      const s = subscribers[id];
+      // Field view shows NO money, NO payment status — readings only.
+      const badge = s.readToday
+        ? `<span class="route-badge done">Read ✓</span>`
+        : `<span class="route-badge todo">To read</span>`;
+      return `<div class="sub-row" onclick="showFieldReading('${id}')">
+        <div class="sub-avatar">${s.initials}</div>
+        <div class="sub-info">
+          <div class="sub-name">${s.name}</div>
+          <div class="sub-meta">${s.meter} · ${s.tier} · ${s.addr}</div>
+        </div>
+        <div class="sub-amount">${badge}</div>
+      </div>`;
+    }).join('');
+    document.getElementById('route-list').innerHTML = rows;
+  }
+
+  let photoAttached = false;
+  function showFieldReading(id) {
+    const s = subscribers[id];
+    photoAttached = false;
+    const html = `
+      <div class="detail-head">
+        <div class="detail-avatar">${s.initials}</div>
+        <div>
+          <div class="detail-name">${s.name}</div>
+          <div class="detail-sub">${s.meter} · ${s.tier} · ${s.addr}</div>
+        </div>
+      </div>
+
+      <div class="receipt">
+        <div class="receipt-title">Enter this month's reading</div>
+        <div class="reading-row"><span class="reading-label">Last reading (${s.date && s.date.includes('Nov') ? 'Oct' : 'last month'})</span><span class="reading-val">${s.prev.toLocaleString()} kWh</span></div>
+        <div class="rate-field" style="margin-top:12px;">
+          <label for="fieldReadingInput">Current reading (kWh)</label>
+          <input type="number" id="fieldReadingInput" inputmode="numeric" placeholder="e.g. ${s.curr.toLocaleString()}">
+        </div>
+        <button class="btn-ghost" id="photoBtn" onclick="attachPhoto()" style="margin-top:12px;">
+          📷 Attach meter photo
+        </button>
+        <div id="photoStatus" class="photo-status" style="display:none;">✓ Photo attached</div>
+      </div>
+
+      <button class="btn-primary" onclick="saveReading('${id}')">Save reading</button>
+    `;
+    document.getElementById('reading-content').innerHTML = html;
+    showScreen('reading');
+  }
+
+  function attachPhoto() {
+    photoAttached = true;
+    document.getElementById('photoStatus').style.display = 'block';
+    const btn = document.getElementById('photoBtn');
+    btn.textContent = '📷 Photo captured — retake';
+  }
+
+  function saveReading(id) {
+    subscribers[id].readToday = true;
+    renderRoute();
+    showScreen('route');
+  }
+
+  document.getElementById('roleToggle').addEventListener('click', () => setRole('field'));
+  document.getElementById('exitFieldBtn').addEventListener('click', () => setRole('admin'));
 
   // ---- Live rate engine ----
   // Model: break_even = (diesel + opex) / kWh_sold ; margin = (rate - break_even) / rate
