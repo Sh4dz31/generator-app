@@ -324,6 +324,51 @@
   }
   .btn-primary:active { opacity: 0.85; }
 
+  /* RATE EDITOR */
+  .rate-editor {
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 14px;
+    padding: 14px;
+    background: var(--surface-2);
+    border-radius: 8px;
+    animation: fadeIn 160ms ease-out;
+  }
+  .rate-editor.open { display: flex; }
+  .rate-field { display: flex; flex-direction: column; gap: 5px; }
+  .rate-field label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .rate-field input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 18px;
+    font-family: 'Geist Mono', monospace;
+    font-weight: 500;
+    color: var(--text);
+    outline: none;
+    -moz-appearance: textfield;
+  }
+  .rate-field input::-webkit-outer-spin-button,
+  .rate-field input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .rate-field input:focus { border-color: var(--accent); }
+  .rate-hint {
+    font-size: 12px;
+    color: var(--text-muted);
+    padding-top: 2px;
+  }
+  .rate-hint strong { color: var(--text); font-weight: 600; }
+  .rate-hint.warn strong { color: var(--warning); }
+  .rate-hint.danger strong { color: var(--danger); }
+
   /* ATTENTION LIST */
   .attention-item {
     background: var(--surface);
@@ -716,8 +761,8 @@
         </div>
         <div class="stat-card">
           <div class="stat-label">Margin</div>
-          <div class="stat-value">24%</div>
-          <div class="stat-meta down">↓ 4% vs Oct</div>
+          <div class="stat-value" id="marginStat">24%</div>
+          <div class="stat-meta down" id="marginDelta">↓ 4% vs Oct</div>
         </div>
       </div>
 
@@ -750,14 +795,28 @@
       <div class="diesel-card">
         <div class="diesel-alert">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-          <div class="diesel-alert-text">Diesel price up <strong>8%</strong> this week. Your rate hasn't moved — you're losing margin right now.</div>
+          <div class="diesel-alert-text">Diesel up <strong>8%</strong> this week. Your rate hasn't moved — every dollar of diesel is eating into your margin. Recalculate to see where you stand.</div>
         </div>
         <div class="diesel-rows">
-          <div class="diesel-row"><span class="diesel-row-label">Diesel cost (Nov)</span><span class="diesel-row-value">$19,010</span></div>
-          <div class="diesel-row"><span class="diesel-row-label">Current rate</span><span class="diesel-row-value">$0.61 / kWh</span></div>
-          <div class="diesel-row"><span class="diesel-row-label">Break-even rate</span><span class="diesel-row-value danger">$0.65 / kWh</span></div>
+          <div class="diesel-row"><span class="diesel-row-label">Diesel cost (Nov)</span><span class="diesel-row-value" id="dieselCostDisplay">$19,010</span></div>
+          <div class="diesel-row"><span class="diesel-row-label">Charge rate</span><span class="diesel-row-value" id="rateDisplay">$0.61 / kWh</span></div>
+          <div class="diesel-row"><span class="diesel-row-label">Break-even (cost floor)</span><span class="diesel-row-value" id="breakEvenDisplay">$0.46 / kWh</span></div>
+          <div class="diesel-row"><span class="diesel-row-label">Margin</span><span class="diesel-row-value" id="marginDisplayCard">24%</span></div>
         </div>
-        <button class="btn-primary">Recalculate rate</button>
+
+        <div class="rate-editor" id="rateEditor">
+          <div class="rate-field">
+            <label for="dieselInput">Diesel cost this month ($)</label>
+            <input type="number" id="dieselInput" value="19010" inputmode="numeric">
+          </div>
+          <div class="rate-field">
+            <label for="rateInput">Your charge rate ($/kWh)</label>
+            <input type="number" id="rateInput" value="0.61" step="0.01" inputmode="decimal">
+          </div>
+          <div class="rate-hint" id="rateHint">Margin at this rate: <strong>24%</strong> · cost floor $0.46/kWh</div>
+        </div>
+
+        <button class="btn-primary" id="recalcBtn">Recalculate rate</button>
       </div>
 
       <div class="section-head">
@@ -1067,6 +1126,53 @@
     document.getElementById('detail-content').innerHTML = html;
     showScreen('detail');
   }
+
+  // ---- Live rate engine ----
+  // Model: break_even = (diesel + opex) / kWh_sold ; margin = (rate - break_even) / rate
+  const KWH_SOLD = 45500;   // total kWh delivered this month (demo constant)
+  const OPEX = 2000;        // maintenance + salaries (demo constant)
+  const OCT_MARGIN = 28;    // last month's margin, for the vs-Oct delta
+  let rateEditorOpen = false;
+
+  function recalcRate() {
+    const diesel = parseFloat(document.getElementById('dieselInput').value) || 0;
+    const rate = parseFloat(document.getElementById('rateInput').value) || 0;
+    const breakEven = (diesel + OPEX) / KWH_SOLD;
+    const margin = rate > 0 ? ((rate - breakEven) / rate) * 100 : 0;
+    const marginRounded = Math.round(margin);
+    const delta = marginRounded - OCT_MARGIN;
+
+    document.getElementById('dieselCostDisplay').textContent = '$' + diesel.toLocaleString();
+    document.getElementById('rateDisplay').textContent = '$' + rate.toFixed(2) + ' / kWh';
+
+    const beEl = document.getElementById('breakEvenDisplay');
+    beEl.textContent = '$' + breakEven.toFixed(2) + ' / kWh';
+    beEl.classList.toggle('danger', rate <= breakEven);
+
+    const marginStr = marginRounded + '%';
+    document.getElementById('marginDisplayCard').textContent = marginStr;
+    document.getElementById('marginStat').textContent = marginStr;
+
+    // vs-October delta line on the hero stat
+    const deltaEl = document.getElementById('marginDelta');
+    if (delta < 0) { deltaEl.textContent = '↓ ' + Math.abs(delta) + '% vs Oct'; deltaEl.className = 'stat-meta down'; }
+    else if (delta > 0) { deltaEl.textContent = '↑ ' + delta + '% vs Oct'; deltaEl.className = 'stat-meta up'; }
+    else { deltaEl.textContent = 'flat vs Oct'; deltaEl.className = 'stat-meta'; }
+
+    // live hint inside the editor
+    const hint = document.getElementById('rateHint');
+    hint.innerHTML = 'Margin at this rate: <strong>' + marginStr + '</strong> · cost floor $' + breakEven.toFixed(2) + '/kWh';
+    hint.className = 'rate-hint' + (marginRounded <= 0 ? ' danger' : (marginRounded < 15 ? ' warn' : ''));
+  }
+
+  document.getElementById('recalcBtn').addEventListener('click', () => {
+    rateEditorOpen = !rateEditorOpen;
+    document.getElementById('rateEditor').classList.toggle('open', rateEditorOpen);
+    document.getElementById('recalcBtn').textContent = rateEditorOpen ? 'Done' : 'Recalculate rate';
+    if (rateEditorOpen) recalcRate();
+  });
+  document.getElementById('dieselInput').addEventListener('input', recalcRate);
+  document.getElementById('rateInput').addEventListener('input', recalcRate);
   document.querySelectorAll('.nav-item').forEach(btn => {
     btn.addEventListener('click', () => showScreen(btn.dataset.screen));
   });
