@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0a0a0a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Moteur — Abu Khalil</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fafaf9;
+    --surface: #ffffff;
+    --surface-2: #f5f5f4;
+    --border: #e7e5e4;
+    --border-strong: #d6d3d1;
+    --text: #18181b;
+    --text-muted: #71717a;
+    --text-faint: #a1a1aa;
+    --accent: #ea580c;
+    --accent-soft: #fff7ed;
+    --accent-border: #fed7aa;
+    --success: #15803d;
+    --success-soft: #f0fdf4;
+    --success-border: #bbf7d0;
+    --warning: #a16207;
+    --warning-soft: #fefce8;
+    --warning-border: #fde68a;
+    --danger: #b91c1c;
+    --danger-soft: #fef2f2;
+    --danger-border: #fecaca;
+    --info: #1d4ed8;
+    --info-soft: #eff6ff;
+    --info-border: #bfdbfe;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
+  }
+
+  [data-theme="dark"] {
+    --bg: #09090b;
+    --surface: #18181b;
+    --surface-2: #27272a;
+    --border: #27272a;
+    --border-strong: #3f3f46;
+    --text: #fafafa;
+    --text-muted: #a1a1aa;
+    --text-faint: #71717a;
+    --accent: #fb923c;
+    --accent-soft: #2a1810;
+    --accent-border: #7c2d12;
+    --success: #4ade80;
+    --success-soft: #0f1f15;
+    --success-border: #14532d;
+    --warning: #facc15;
+    --warning-soft: #1f1a08;
+    --warning-border: #713f12;
+    --danger: #f87171;
+    --danger-soft: #1f1010;
+    --danger-border: #7f1d1d;
+    --info: #60a5fa;
+    --info-soft: #0c1424;
+    --info-border: #1e3a8a;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+    --shadow-md: 0 1px 3px rgba(0,0,0,0.4), 0 4px 12px rgba(0,0,0,0.2);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; }
+  body {
+    font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+  }
+
+  .phone-frame {
+    max-width: 420px;
+    margin: 0 auto;
+    height: 100vh;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* HEADER */
+  .app-header {
+    flex-shrink: 0;
+    padding: 14px 20px 12px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .brand-mark {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    background: var(--text);
+    color: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: -0.02em;
+  }
+  .brand-text {
+    display: flex; flex-direction: column;
+  }
+  .brand-name { font-weight: 600; font-size: 14px; letter-spacing: -0.01em; }
+  .brand-sub { font-size: 11px; color: var(--text-muted); font-family: 'Geist Mono', monospace; }
+  .header-actions { display: flex; gap: 8px; align-items: center; }
+  .icon-btn {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    background: transparent;
+    border: none;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: background 120ms, color 120ms;
+  }
+  .icon-btn:hover { background: var(--surface-2); color: var(--text); }
+  .icon-btn svg { width: 18px; height: 18px; }
+
+  /* CONTENT */
+  .app-content {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 16px 20px 24px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .screen { display: none; }
+  .screen.active { display: block; animation: fadeIn 200ms ease-out; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+  .screen-title {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin-bottom: 2px;
+  }
+  .screen-subtitle {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+  }
+
+  /* STAT CARDS */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    position: relative;
+  }
+  .stat-card.hero {
+    grid-column: span 2;
+    background: var(--text);
+    color: var(--bg);
+    border-color: var(--text);
+  }
+  .stat-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    font-weight: 500;
+    margin-bottom: 6px;
+  }
+  .stat-card.hero .stat-label { color: rgba(255,255,255,0.6); }
+  [data-theme="dark"] .stat-card.hero .stat-label { color: rgba(0,0,0,0.5); }
+  .stat-value {
+    font-size: 26px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    font-family: 'Geist Mono', monospace;
+    line-height: 1.1;
+  }
+  .stat-card.hero .stat-value { font-size: 32px; }
+  .stat-meta {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 4px;
+    font-family: 'Geist Mono', monospace;
+  }
+  .stat-card.hero .stat-meta { color: rgba(255,255,255,0.6); }
+  [data-theme="dark"] .stat-card.hero .stat-meta { color: rgba(0,0,0,0.5); }
+  .stat-meta.up { color: var(--success); }
+  .stat-meta.down { color: var(--danger); }
+
+  /* SECTION */
+  .section-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin: 24px 0 10px;
+  }
+  .section-title {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+  }
+  .section-link {
+    font-size: 12px;
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  /* PROGRESS CARD */
+  .progress-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  .progress-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 12px;
+  }
+  .progress-row-main { font-weight: 500; font-size: 14px; }
+  .progress-row-sub { font-size: 11px; color: var(--text-muted); font-family: 'Geist Mono', monospace; }
+  .progress-bar {
+    height: 6px;
+    background: var(--surface-2);
+    border-radius: 3px;
+    overflow: hidden;
+    display: flex;
+    margin-bottom: 12px;
+  }
+  .progress-seg-paid { background: var(--success); }
+  .progress-seg-pending { background: var(--warning); }
+  .progress-seg-overdue { background: var(--danger); }
+  .progress-legend {
+    display: flex;
+    gap: 16px;
+    font-size: 12px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-muted);
+  }
+  .legend-dot {
+    width: 8px; height: 8px;
+    border-radius: 2px;
+  }
+  .legend-num { font-family: 'Geist Mono', monospace; color: var(--text); font-weight: 500; }
+
+  /* DIESEL CARD */
+  .diesel-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  .diesel-alert {
+    background: var(--warning-soft);
+    border: 1px solid var(--warning-border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    margin-bottom: 14px;
+  }
+  .diesel-alert svg { width: 16px; height: 16px; color: var(--warning); flex-shrink: 0; margin-top: 1px; }
+  .diesel-alert-text { font-size: 12px; line-height: 1.45; }
+  .diesel-alert-text strong { font-weight: 600; }
+  .diesel-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .diesel-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+  }
+  .diesel-row-label { color: var(--text-muted); }
+  .diesel-row-value { font-family: 'Geist Mono', monospace; font-weight: 500; }
+  .diesel-row-value.danger { color: var(--danger); }
+  .btn-primary {
+    width: 100%;
+    background: var(--text);
+    color: var(--bg);
+    border: none;
+    border-radius: 8px;
+    padding: 11px;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    transition: opacity 120ms;
+  }
+  .btn-primary:active { opacity: 0.85; }
+
+  /* ATTENTION LIST */
+  .attention-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 8px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .attention-icon {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .attention-icon svg { width: 16px; height: 16px; }
+  .attention-icon.danger { background: var(--danger-soft); color: var(--danger); }
+  .attention-icon.warning { background: var(--warning-soft); color: var(--warning); }
+  .attention-icon.info { background: var(--info-soft); color: var(--info); }
+  .attention-body { flex: 1; }
+  .attention-title { font-size: 13px; font-weight: 500; margin-bottom: 2px; }
+  .attention-sub { font-size: 12px; color: var(--text-muted); }
+  .attention-action {
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text);
+    cursor: pointer;
+    font-family: inherit;
+    flex-shrink: 0;
+    align-self: center;
+  }
+
+  /* BILLING SCREEN */
+  .billing-toolbar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .toolbar-btn {
+    flex: 1;
+    background: var(--text);
+    color: var(--bg);
+    border: none;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 12px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .toolbar-btn.secondary {
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border-strong);
+  }
+  .toolbar-btn svg { width: 14px; height: 14px; }
+
+  .search-bar {
+    position: relative;
+    margin-bottom: 12px;
+  }
+  .search-bar svg {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px; height: 16px;
+    color: var(--text-faint);
+  }
+  .search-bar input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px 10px 36px;
+    font-size: 13px;
+    font-family: inherit;
+    color: var(--text);
+    outline: none;
+  }
+  .search-bar input:focus { border-color: var(--text-muted); }
+
+  .filter-chips {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    margin-bottom: 14px;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+  .filter-chips::-webkit-scrollbar { display: none; }
+  .chip {
+    flex-shrink: 0;
+    padding: 7px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 120ms;
+  }
+  .chip.active {
+    background: var(--text);
+    color: var(--bg);
+    border-color: var(--text);
+  }
+  .chip-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+  }
+  .chip-count {
+    font-family: 'Geist Mono', monospace;
+    font-size: 11px;
+    opacity: 0.7;
+  }
+
+  /* SUBSCRIBER LIST */
+  .sub-list {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .sub-row {
+    padding: 14px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    cursor: pointer;
+    transition: background 100ms;
+  }
+  .sub-row:last-child { border-bottom: none; }
+  .sub-row:active { background: var(--surface-2); }
+  .sub-row.disputed { background: var(--warning-soft); }
+  .sub-row.overdue { background: var(--danger-soft); }
+
+  .sub-avatar {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    background: var(--surface-2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    flex-shrink: 0;
+    letter-spacing: -0.02em;
+  }
+  .sub-info { flex: 1; min-width: 0; }
+  .sub-name {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 2px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .sub-name svg { width: 13px; height: 13px; }
+  .sub-meta {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-family: 'Geist Mono', monospace;
+  }
+  .sub-amount {
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .sub-amount-value {
+    font-family: 'Geist Mono', monospace;
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 2px;
+  }
+  .sub-badge {
+    display: inline-block;
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 999px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+  .sub-badge.paid { background: var(--success-soft); color: var(--success); border: 1px solid var(--success-border); }
+  .sub-badge.pending { background: var(--warning-soft); color: var(--warning); border: 1px solid var(--warning-border); }
+  .sub-badge.disputed { background: var(--warning-soft); color: var(--warning); border: 1px solid var(--warning-border); }
+  .sub-badge.overdue { background: var(--danger-soft); color: var(--danger); border: 1px solid var(--danger-border); }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    flex-shrink: 0;
+    display: flex;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 6px 0 max(6px, env(safe-area-inset-bottom));
+  }
+  .nav-item {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 8px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    cursor: pointer;
+    color: var(--text-faint);
+    font-family: inherit;
+    font-size: 10px;
+    font-weight: 500;
+    transition: color 120ms;
+  }
+  .nav-item.active { color: var(--text); }
+  .nav-item svg { width: 22px; height: 22px; }
+  .nav-item-label { font-size: 10px; }
+
+  /* SUBSCRIBER COUNT */
+  .list-footer {
+    text-align: center;
+    padding: 14px;
+    font-size: 11px;
+    color: var(--text-muted);
+    font-family: 'Geist Mono', monospace;
+  }
+
+  /* EMPTY STATES FOR SCREENS NOT YET BUILT */
+  .placeholder {
+    padding: 60px 20px;
+    text-align: center;
+    color: var(--text-muted);
+  }
+  .placeholder-icon {
+    width: 48px; height: 48px;
+    background: var(--surface-2);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px;
+  }
+  .placeholder-icon svg { width: 22px; height: 22px; color: var(--text-faint); }
+  .placeholder-title { font-size: 15px; font-weight: 500; color: var(--text); margin-bottom: 6px; }
+  .placeholder-text { font-size: 13px; line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<div class="phone-frame">
+
+  <!-- HEADER -->
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-mark">M</div>
+      <div class="brand-text">
+        <span class="brand-name">Abu Khalil</span>
+        <span class="brand-sub">Jal el Dib · Nov 2026</span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="icon-btn" id="themeToggle" aria-label="Toggle theme">
+        <svg id="iconSun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+        <svg id="iconMoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <button class="icon-btn" aria-label="Notifications">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- CONTENT -->
+  <main class="app-content">
+
+    <!-- DASHBOARD SCREEN -->
+    <section class="screen active" id="screen-dashboard">
+      <h1 class="screen-title">Overview</h1>
+      <p class="screen-subtitle">287 subscribers · cycle closes Dec 5</p>
+
+      <div class="stat-grid">
+        <div class="stat-card hero">
+          <div class="stat-label">Collected this month</div>
+          <div class="stat-value">$8,420</div>
+          <div class="stat-meta">of $11,150 billed · 75%</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Outstanding</div>
+          <div class="stat-value">$2,730</div>
+          <div class="stat-meta">47 subscribers</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Margin</div>
+          <div class="stat-value">23%</div>
+          <div class="stat-meta down">↓ 4% vs Oct</div>
+        </div>
+      </div>
+
+      <div class="section-head">
+        <span class="section-title">Collection</span>
+        <a class="section-link" href="#" onclick="showScreen('billing'); return false;">View all →</a>
+      </div>
+
+      <div class="progress-card">
+        <div class="progress-row">
+          <span class="progress-row-main">November cycle</span>
+          <span class="progress-row-sub">day 24 of 30</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-seg-paid" style="width: 84%"></div>
+          <div class="progress-seg-pending" style="width: 11%"></div>
+          <div class="progress-seg-overdue" style="width: 5%"></div>
+        </div>
+        <div class="progress-legend">
+          <div class="legend-item"><span class="legend-dot" style="background: var(--success)"></span>Paid <span class="legend-num">240</span></div>
+          <div class="legend-item"><span class="legend-dot" style="background: var(--warning)"></span>Pending <span class="legend-num">32</span></div>
+          <div class="legend-item"><span class="legend-dot" style="background: var(--danger)"></span>Overdue <span class="legend-num">15</span></div>
+        </div>
+      </div>
+
+      <div class="section-head">
+        <span class="section-title">Diesel &amp; rate</span>
+      </div>
+
+      <div class="diesel-card">
+        <div class="diesel-alert">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <div class="diesel-alert-text">Diesel price up <strong>8%</strong> this week. Your rate hasn't moved — you're losing margin right now.</div>
+        </div>
+        <div class="diesel-rows">
+          <div class="diesel-row"><span class="diesel-row-label">Diesel cost (Nov)</span><span class="diesel-row-value">$6,200</span></div>
+          <div class="diesel-row"><span class="diesel-row-label">Current rate</span><span class="diesel-row-value">$0.32 / kWh</span></div>
+          <div class="diesel-row"><span class="diesel-row-label">Break-even rate</span><span class="diesel-row-value danger">$0.34 / kWh</span></div>
+        </div>
+        <button class="btn-primary">Recalculate rate</button>
+      </div>
+
+      <div class="section-head">
+        <span class="section-title">Needs attention</span>
+      </div>
+
+      <div class="attention-item">
+        <div class="attention-icon danger">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <div class="attention-body">
+          <div class="attention-title">15 subscribers overdue 2+ months</div>
+          <div class="attention-sub">$1,180 unpaid · ready to send reminders</div>
+        </div>
+        <button class="attention-action">Send</button>
+      </div>
+
+      <div class="attention-item">
+        <div class="attention-icon warning">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </div>
+        <div class="attention-body">
+          <div class="attention-title">6 meter readings disputed</div>
+          <div class="attention-sub">All have photo evidence attached</div>
+        </div>
+        <button class="attention-action">Review</button>
+      </div>
+
+      <div class="attention-item">
+        <div class="attention-icon info">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        </div>
+        <div class="attention-body">
+          <div class="attention-title">32 pending payments</div>
+          <div class="attention-sub">Avg 6 days since bill sent</div>
+        </div>
+        <button class="attention-action">Nudge</button>
+      </div>
+    </section>
+
+    <!-- BILLING SCREEN -->
+    <section class="screen" id="screen-billing">
+      <h1 class="screen-title">Billing</h1>
+      <p class="screen-subtitle">November 2026 · $0.32 / kWh</p>
+
+      <div class="billing-toolbar">
+        <button class="toolbar-btn secondary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          Enter readings
+        </button>
+        <button class="toolbar-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+          Send all bills
+        </button>
+      </div>
+
+      <div class="search-bar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" placeholder="Search subscriber, number, or address">
+      </div>
+
+      <div class="filter-chips">
+        <button class="chip active">All <span class="chip-count">287</span></button>
+        <button class="chip"><span class="chip-dot" style="background: var(--success)"></span>Paid <span class="chip-count">240</span></button>
+        <button class="chip"><span class="chip-dot" style="background: var(--warning)"></span>Pending <span class="chip-count">32</span></button>
+        <button class="chip"><span class="chip-dot" style="background: var(--danger)"></span>Overdue <span class="chip-count">15</span></button>
+        <button class="chip"><span class="chip-dot" style="background: var(--warning)"></span>Disputed <span class="chip-count">6</span></button>
+      </div>
+
+      <div class="sub-list">
+        <div class="sub-row">
+          <div class="sub-avatar">ZH</div>
+          <div class="sub-info">
+            <div class="sub-name">Ziad Hourani</div>
+            <div class="sub-meta">#142 · 192 kWh · Whish, Nov 22</div>
+          </div>
+          <div class="sub-amount">
+            <div class="sub-amount-value">$61.44</div>
+            <span class="sub-badge paid">Paid</span>
+          </div>
+        </div>
+
+        <div class="sub-row">
+          <div class="sub-avatar">RK</div>
+          <div class="sub-info">
+            <div class="sub-name">Rania Khoury</div>
+            <div class="sub-meta">#078 · 98 kWh · bill sent Nov 19</div>
+          </div>
+          <div class="sub-amount">
+            <div class="sub-amount-value">$31.36</div>
+            <span class="sub-badge pending">Pending</span>
+          </div>
+        </div>
+
+        <div class="sub-row disputed">
+          <div class="sub-avatar">EM</div>
+          <div class="sub-info">
+            <div class="sub-name">
+              Elie Mansour
+              <svg viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+            <div class="sub-meta">#203 · 375 kWh · photo attached</div>
+          </div>
+          <div class="sub-amount">
+            <div class="sub-amount-value">$120.00</div>
+            <span class="sub-badge disputed">Disputed</span>
+          </div>
+        </div>
+
+        <div class="sub-row">
+          <div class="sub-avatar">MS</div>
+          <div class="sub-info">
+            <div class="sub-name">Marwan Saliba</div>
+            <div class="sub-meta">#019 · 125 kWh · Cash, Nov 18</div>
+          </div>
+          <div class="sub-amount">
+            <div class="sub-amount-value">$40.00</div>
+            <span class="sub-badge paid">Paid</span>
+          </div>
+        </div>
+
+        <div class="sub-row overdue">
+          <div class="sub-avatar">JD</div>
+          <div class="sub-info">
+            <div class="sub-name">Joseph Daher</div>
+            <div class="sub-meta">#251 · 240 kWh · overdue 2 months</div>
+          </div>
+          <div class="sub-amount">
+            <div class="sub-amount-value">$76.80</div>
+            <span class="sub-badge overdue">Overdue</span>
+          </div>
+        </div>
+
+        <div class="sub-row">
+          <div class="sub-avatar">NR</div>
+          <div class="sub-info">
+            <div class="sub-name">Nada Abi Rached</div>
+            <div class="sub-meta">#114 · 72 kWh · OMT, Nov 24</div>
+          </div>
+          <div class="sub-amount">
+            <div class="sub-amount-value">$23.04</div>
+            <span class="sub-badge paid">Paid</span>
+          </div>
+        </div>
+
+        <div class="sub-row">
+          <div class="sub-avatar">SG</div>
+          <div class="sub-info">
+            <div class="sub-name">Sami Geagea</div>
+            <div class="sub-meta">#087 · 156 kWh · Whish, Nov 23</div>
+          </div>
+          <div class="sub-amount">
+            <div class="sub-amount-value">$49.92</div>
+            <span class="sub-badge paid">Paid</span>
+          </div>
+        </div>
+
+        <div class="sub-row">
+          <div class="sub-avatar">LF</div>
+          <div class="sub-info">
+            <div class="sub-name">Layla Frangieh</div>
+            <div class="sub-meta">#166 · 88 kWh · bill sent Nov 20</div>
+          </div>
+          <div class="sub-amount">
+            <div class="sub-amount-value">$28.16</div>
+            <span class="sub-badge pending">Pending</span>
+          </div>
+        </div>
+      </div>
+      <div class="list-footer">Showing 8 of 287</div>
+    </section>
+
+    <!-- SUBSCRIBERS SCREEN (placeholder) -->
+    <section class="screen" id="screen-subscribers">
+      <div class="placeholder">
+        <div class="placeholder-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div class="placeholder-title">Subscriber directory</div>
+        <div class="placeholder-text">Full subscriber list with payment history, contact details, and meter readings.</div>
+      </div>
+    </section>
+
+    <!-- REPORTS SCREEN (placeholder) -->
+    <section class="screen" id="screen-reports">
+      <div class="placeholder">
+        <div class="placeholder-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        </div>
+        <div class="placeholder-title">Reports</div>
+        <div class="placeholder-text">Monthly P&amp;L, diesel cost trends, collection rates, customer churn.</div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" data-screen="dashboard">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span class="nav-item-label">Home</span>
+    </button>
+    <button class="nav-item" data-screen="billing">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      <span class="nav-item-label">Billing</span>
+    </button>
+    <button class="nav-item" data-screen="subscribers">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span class="nav-item-label">Subscribers</span>
+    </button>
+    <button class="nav-item" data-screen="reports">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      <span class="nav-item-label">Reports</span>
+    </button>
+  </nav>
+
+</div>
+
+<script>
+  function showScreen(name) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen-' + name).classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.querySelector('.nav-item[data-screen="' + name + '"]').classList.add('active');
+    document.querySelector('.app-content').scrollTop = 0;
+  }
+  document.querySelectorAll('.nav-item').forEach(btn => {
+    btn.addEventListener('click', () => showScreen(btn.dataset.screen));
+  });
+
+  // Theme toggle
+  const root = document.documentElement;
+  const sun = document.getElementById('iconSun');
+  const moon = document.getElementById('iconMoon');
+  document.getElementById('themeToggle').addEventListener('click', () => {
+    const isDark = root.getAttribute('data-theme') === 'dark';
+    if (isDark) {
+      root.removeAttribute('data-theme');
+      sun.style.display = 'block';
+      moon.style.display = 'none';
+    } else {
+      root.setAttribute('data-theme', 'dark');
+      sun.style.display = 'none';
+      moon.style.display = 'block';
+    }
+  });
+
+  // Filter chips
+  document.querySelectorAll('.chip').forEach(c => {
+    c.addEventListener('click', () => {
+      document.querySelectorAll('.chip').forEach(x => x.classList.remove('active'));
+      c.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>
