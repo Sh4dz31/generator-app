@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#0a0a0a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>Moteur — Abu Khalil</title>
+<title>Moteur Central</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -579,6 +579,96 @@
   .placeholder-icon svg { width: 22px; height: 22px; color: var(--text-faint); }
   .placeholder-title { font-size: 15px; font-weight: 500; color: var(--text); margin-bottom: 6px; }
   .placeholder-text { font-size: 13px; line-height: 1.5; }
+
+  /* SUBSCRIBER DETAIL */
+  .back-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 0 0 14px;
+  }
+  .back-btn svg { width: 16px; height: 16px; }
+  .detail-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  .detail-avatar {
+    width: 48px; height: 48px;
+    border-radius: 10px;
+    background: var(--surface-2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: -0.02em;
+  }
+  .detail-name { font-size: 18px; font-weight: 600; letter-spacing: -0.01em; }
+  .detail-sub { font-size: 12px; color: var(--text-muted); font-family: 'Geist Mono', monospace; }
+  .receipt {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  .receipt-title {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    margin-bottom: 14px;
+  }
+  .receipt-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 13px;
+    padding: 7px 0;
+  }
+  .receipt-row-label { color: var(--text-muted); }
+  .receipt-row-val { font-family: 'Geist Mono', monospace; font-weight: 500; }
+  .receipt-divider { height: 1px; background: var(--border); margin: 8px 0; }
+  .receipt-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-top: 4px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border-strong);
+  }
+  .receipt-total-label { font-size: 14px; font-weight: 600; }
+  .receipt-total-val { font-family: 'Geist Mono', monospace; font-size: 18px; font-weight: 600; }
+  .receipt-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--text-faint);
+    margin-top: 10px;
+    font-family: 'Geist Mono', monospace;
+  }
+  .detail-actions {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .detail-actions .toolbar-btn { flex: 1; }
+  .reading-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    padding: 7px 0;
+  }
+  .reading-label { color: var(--text-muted); }
+  .reading-val { font-family: 'Geist Mono', monospace; font-weight: 500; }
 </style>
 </head>
 <body>
@@ -590,8 +680,8 @@
     <div class="brand">
       <div class="brand-mark">M</div>
       <div class="brand-text">
-        <span class="brand-name">Abu Khalil</span>
-        <span class="brand-sub">Jal el Dib · Nov 2026</span>
+        <span class="brand-name">Moteur Central</span>
+        <span class="brand-sub">Ballouneh · Nov 2026</span>
       </div>
     </div>
     <div class="header-actions">
@@ -616,17 +706,17 @@
       <div class="stat-grid">
         <div class="stat-card hero">
           <div class="stat-label">Collected this month</div>
-          <div class="stat-value">$8,420</div>
-          <div class="stat-meta">of $11,150 billed · 75%</div>
+          <div class="stat-value">$22,690</div>
+          <div class="stat-meta">of $30,660 billed · 74%</div>
         </div>
         <div class="stat-card">
           <div class="stat-label">Outstanding</div>
-          <div class="stat-value">$2,730</div>
+          <div class="stat-value">$7,970</div>
           <div class="stat-meta">47 subscribers</div>
         </div>
         <div class="stat-card">
           <div class="stat-label">Margin</div>
-          <div class="stat-value">23%</div>
+          <div class="stat-value">24%</div>
           <div class="stat-meta down">↓ 4% vs Oct</div>
         </div>
       </div>
@@ -663,9 +753,9 @@
           <div class="diesel-alert-text">Diesel price up <strong>8%</strong> this week. Your rate hasn't moved — you're losing margin right now.</div>
         </div>
         <div class="diesel-rows">
-          <div class="diesel-row"><span class="diesel-row-label">Diesel cost (Nov)</span><span class="diesel-row-value">$6,200</span></div>
-          <div class="diesel-row"><span class="diesel-row-label">Current rate</span><span class="diesel-row-value">$0.32 / kWh</span></div>
-          <div class="diesel-row"><span class="diesel-row-label">Break-even rate</span><span class="diesel-row-value danger">$0.34 / kWh</span></div>
+          <div class="diesel-row"><span class="diesel-row-label">Diesel cost (Nov)</span><span class="diesel-row-value">$19,010</span></div>
+          <div class="diesel-row"><span class="diesel-row-label">Current rate</span><span class="diesel-row-value">$0.61 / kWh</span></div>
+          <div class="diesel-row"><span class="diesel-row-label">Break-even rate</span><span class="diesel-row-value danger">$0.65 / kWh</span></div>
         </div>
         <button class="btn-primary">Recalculate rate</button>
       </div>
@@ -680,7 +770,7 @@
         </div>
         <div class="attention-body">
           <div class="attention-title">15 subscribers overdue 2+ months</div>
-          <div class="attention-sub">$1,180 unpaid · ready to send reminders</div>
+          <div class="attention-sub">$3,240 unpaid · ready to send reminders</div>
         </div>
         <button class="attention-action">Send</button>
       </div>
@@ -711,7 +801,7 @@
     <!-- BILLING SCREEN -->
     <section class="screen" id="screen-billing">
       <h1 class="screen-title">Billing</h1>
-      <p class="screen-subtitle">November 2026 · $0.32 / kWh</p>
+      <p class="screen-subtitle">November 2026 · $0.61 / kWh + tier fee</p>
 
       <div class="billing-toolbar">
         <button class="toolbar-btn secondary">
@@ -738,101 +828,101 @@
       </div>
 
       <div class="sub-list">
-        <div class="sub-row">
+        <div class="sub-row" onclick="showDetail('ziad')">
           <div class="sub-avatar">ZH</div>
           <div class="sub-info">
             <div class="sub-name">Ziad Hourani</div>
-            <div class="sub-meta">#142 · 192 kWh · Whish, Nov 22</div>
+            <div class="sub-meta">PAF 142 · 10A · 188 kWh · Whish</div>
           </div>
           <div class="sub-amount">
-            <div class="sub-amount-value">$61.44</div>
+            <div class="sub-amount-value">$135.35</div>
             <span class="sub-badge paid">Paid</span>
           </div>
         </div>
 
-        <div class="sub-row">
+        <div class="sub-row" onclick="showDetail('rania')">
           <div class="sub-avatar">RK</div>
           <div class="sub-info">
             <div class="sub-name">Rania Khoury</div>
-            <div class="sub-meta">#078 · 98 kWh · bill sent Nov 19</div>
+            <div class="sub-meta">PAF 078 · 5A · 96 kWh · bill sent</div>
           </div>
           <div class="sub-amount">
-            <div class="sub-amount-value">$31.36</div>
+            <div class="sub-amount-value">$69.47</div>
             <span class="sub-badge pending">Pending</span>
           </div>
         </div>
 
-        <div class="sub-row disputed">
+        <div class="sub-row disputed" onclick="showDetail('elie')">
           <div class="sub-avatar">EM</div>
           <div class="sub-info">
             <div class="sub-name">
               Elie Mansour
               <svg viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
             </div>
-            <div class="sub-meta">#203 · 375 kWh · photo attached</div>
+            <div class="sub-meta">PAF 203 · 15A · 372 kWh · photo attached</div>
           </div>
           <div class="sub-amount">
-            <div class="sub-amount-value">$120.00</div>
+            <div class="sub-amount-value">$263.45</div>
             <span class="sub-badge disputed">Disputed</span>
           </div>
         </div>
 
-        <div class="sub-row">
+        <div class="sub-row" onclick="showDetail('marwan')">
           <div class="sub-avatar">MS</div>
           <div class="sub-info">
             <div class="sub-name">Marwan Saliba</div>
-            <div class="sub-meta">#019 · 125 kWh · Cash, Nov 18</div>
+            <div class="sub-meta">PAF 019 · 5A · 104 kWh · Cash</div>
           </div>
           <div class="sub-amount">
-            <div class="sub-amount-value">$40.00</div>
+            <div class="sub-amount-value">$74.86</div>
             <span class="sub-badge paid">Paid</span>
           </div>
         </div>
 
-        <div class="sub-row overdue">
+        <div class="sub-row overdue" onclick="showDetail('joseph')">
           <div class="sub-avatar">JD</div>
           <div class="sub-info">
             <div class="sub-name">Joseph Daher</div>
-            <div class="sub-meta">#251 · 240 kWh · overdue 2 months</div>
+            <div class="sub-meta">PAF 251 · 10A · 215 kWh · overdue 2 months</div>
           </div>
           <div class="sub-amount">
-            <div class="sub-amount-value">$76.80</div>
+            <div class="sub-amount-value">$153.54</div>
             <span class="sub-badge overdue">Overdue</span>
           </div>
         </div>
 
-        <div class="sub-row">
+        <div class="sub-row" onclick="showDetail('nada')">
           <div class="sub-avatar">NR</div>
           <div class="sub-info">
             <div class="sub-name">Nada Abi Rached</div>
-            <div class="sub-meta">#114 · 72 kWh · OMT, Nov 24</div>
+            <div class="sub-meta">PAF 114 · 5A · 68 kWh · Visa</div>
           </div>
           <div class="sub-amount">
-            <div class="sub-amount-value">$23.04</div>
+            <div class="sub-amount-value">$50.60</div>
             <span class="sub-badge paid">Paid</span>
           </div>
         </div>
 
-        <div class="sub-row">
+        <div class="sub-row" onclick="showDetail('sami')">
           <div class="sub-avatar">SG</div>
           <div class="sub-info">
             <div class="sub-name">Sami Geagea</div>
-            <div class="sub-meta">#087 · 156 kWh · Whish, Nov 23</div>
+            <div class="sub-meta">PAF 087 · 10A · 152 kWh · Whish</div>
           </div>
           <div class="sub-amount">
-            <div class="sub-amount-value">$49.92</div>
+            <div class="sub-amount-value">$111.09</div>
             <span class="sub-badge paid">Paid</span>
           </div>
         </div>
 
-        <div class="sub-row">
+        <div class="sub-row" onclick="showDetail('layla')">
           <div class="sub-avatar">LF</div>
           <div class="sub-info">
             <div class="sub-name">Layla Frangieh</div>
-            <div class="sub-meta">#166 · 88 kWh · bill sent Nov 20</div>
+            <div class="sub-meta">PAF 166 · 5A · 84 kWh · bill sent</div>
           </div>
           <div class="sub-amount">
-            <div class="sub-amount-value">$28.16</div>
+            <div class="sub-amount-value">$61.38</div>
             <span class="sub-badge pending">Pending</span>
           </div>
         </div>
@@ -840,15 +930,13 @@
       <div class="list-footer">Showing 8 of 287</div>
     </section>
 
-    <!-- SUBSCRIBERS SCREEN (placeholder) -->
-    <section class="screen" id="screen-subscribers">
-      <div class="placeholder">
-        <div class="placeholder-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        </div>
-        <div class="placeholder-title">Subscriber directory</div>
-        <div class="placeholder-text">Full subscriber list with payment history, contact details, and meter readings.</div>
-      </div>
+    <!-- SUBSCRIBER DETAIL SCREEN -->
+    <section class="screen" id="screen-detail">
+      <button class="back-btn" onclick="showScreen('billing')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        Billing
+      </button>
+      <div id="detail-content"></div>
     </section>
 
     <!-- REPORTS SCREEN (placeholder) -->
@@ -859,6 +947,17 @@
         </div>
         <div class="placeholder-title">Reports</div>
         <div class="placeholder-text">Monthly P&amp;L, diesel cost trends, collection rates, customer churn.</div>
+      </div>
+    </section>
+
+    <!-- SUBSCRIBERS SCREEN (placeholder) -->
+    <section class="screen" id="screen-subscribers">
+      <div class="placeholder">
+        <div class="placeholder-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div class="placeholder-title">Subscriber directory</div>
+        <div class="placeholder-text">Contact details, account history, and per-subscriber technical notes. Tap any subscriber in Billing to see their full account.</div>
       </div>
     </section>
 
@@ -891,8 +990,82 @@
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById('screen-' + name).classList.add('active');
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    document.querySelector('.nav-item[data-screen="' + name + '"]').classList.add('active');
+    const nav = document.querySelector('.nav-item[data-screen="' + name + '"]');
+    if (nav) nav.classList.add('active');
     document.querySelector('.app-content').scrollTop = 0;
+  }
+
+  // Subscriber data — bill = (kWh × $0.61) + tier fee, + 11% VAT
+  const RATE = 0.607;
+  const VAT = 0.11;
+  const tierFee = { '5A': 4.30, '10A': 7.80, '15A': 11.50 };
+  const subscribers = {
+    ziad:   { name:'Ziad Hourani', initials:'ZH', meter:'PAF 142', tier:'10A', addr:'Bldg Saade, Fl 3', prev:4820, curr:5008, status:'paid', method:'Whish', date:'Nov 22' },
+    rania:  { name:'Rania Khoury', initials:'RK', meter:'PAF 078', tier:'5A', addr:'Bldg Antoun, Fl 1', prev:2140, curr:2236, status:'pending', method:null, date:'bill sent Nov 19' },
+    elie:   { name:'Elie Mansour', initials:'EM', meter:'PAF 203', tier:'15A', addr:'Bldg Najjar, Fl 2', prev:7610, curr:7982, status:'disputed', method:null, date:'photo attached' },
+    marwan: { name:'Marwan Saliba', initials:'MS', meter:'PAF 019', tier:'5A', addr:'Bldg Geara, Fl 4', prev:3300, curr:3404, status:'paid', method:'Cash', date:'Nov 18' },
+    joseph: { name:'Joseph Daher', initials:'JD', meter:'PAF 251', tier:'10A', addr:'Bldg Akiki, Fl 1', prev:5940, curr:6155, status:'overdue', method:null, date:'overdue 2 months' },
+    nada:   { name:'Nada Abi Rached', initials:'NR', meter:'PAF 114', tier:'5A', addr:'Bldg Tueni, Fl 5', prev:1860, curr:1928, status:'paid', method:'Visa', date:'Nov 24' },
+    sami:   { name:'Sami Geagea', initials:'SG', meter:'PAF 087', tier:'10A', addr:'Bldg Rahme, Fl 2', prev:4100, curr:4252, status:'paid', method:'Whish', date:'Nov 23' },
+    layla:  { name:'Layla Frangieh', initials:'LF', meter:'PAF 166', tier:'5A', addr:'Bldg Sfeir, Fl 3', prev:2700, curr:2784, status:'pending', method:null, date:'bill sent Nov 20' },
+  };
+  const statusLabel = { paid:'Paid', pending:'Pending', disputed:'Disputed', overdue:'Overdue · 2mo' };
+
+  function money(n){ return '$' + n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+
+  function showDetail(id) {
+    const s = subscribers[id];
+    const kwh = s.curr - s.prev;
+    const consumption = kwh * RATE;
+    const fee = tierFee[s.tier];
+    const subtotal = consumption + fee;
+    const vat = subtotal * VAT;
+    const total = subtotal + vat;
+
+    const paidLine = s.method
+      ? `<div class="receipt-meta"><span>Paid via ${s.method}</span><span>${s.date}</span></div>`
+      : `<div class="receipt-meta"><span>${statusLabel[s.status]}</span><span>${s.date}</span></div>`;
+
+    const html = `
+      <div class="detail-head">
+        <div class="detail-avatar">${s.initials}</div>
+        <div>
+          <div class="detail-name">${s.name}</div>
+          <div class="detail-sub">${s.meter} · ${s.tier} · ${s.addr}</div>
+        </div>
+      </div>
+
+      <div class="receipt">
+        <div class="receipt-title">Meter reading — November</div>
+        <div class="reading-row"><span class="reading-label">Previous</span><span class="reading-val">${s.prev.toLocaleString()} kWh</span></div>
+        <div class="reading-row"><span class="reading-label">Current</span><span class="reading-val">${s.curr.toLocaleString()} kWh</span></div>
+        <div class="receipt-divider"></div>
+        <div class="reading-row"><span class="reading-label">Consumed</span><span class="reading-val">${kwh} kWh</span></div>
+      </div>
+
+      <div class="receipt">
+        <div class="receipt-title">Bill breakdown</div>
+        <div class="receipt-row"><span class="receipt-row-label">Consumption (${kwh} × $0.61)</span><span class="receipt-row-val">${money(consumption)}</span></div>
+        <div class="receipt-row"><span class="receipt-row-label">Fixed fee (${s.tier})</span><span class="receipt-row-val">${money(fee)}</span></div>
+        <div class="receipt-row"><span class="receipt-row-label">Subtotal</span><span class="receipt-row-val">${money(subtotal)}</span></div>
+        <div class="receipt-row"><span class="receipt-row-label">VAT (11%)</span><span class="receipt-row-val">${money(vat)}</span></div>
+        <div class="receipt-total"><span class="receipt-total-label">Total due</span><span class="receipt-total-val">${money(total)}</span></div>
+        ${paidLine}
+      </div>
+
+      <div class="detail-actions">
+        <button class="toolbar-btn secondary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+          Send bill
+        </button>
+        <button class="toolbar-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Mark paid
+        </button>
+      </div>
+    `;
+    document.getElementById('detail-content').innerHTML = html;
+    showScreen('detail');
   }
   document.querySelectorAll('.nav-item').forEach(btn => {
     btn.addEventListener('click', () => showScreen(btn.dataset.screen));
