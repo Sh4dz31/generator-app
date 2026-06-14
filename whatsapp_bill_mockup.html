@@ -5,16 +5,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#075E54">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="فاتورة Whish">
 <title>فاتورة عبر واتساب · Bill via WhatsApp</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
+  :root {
+    /* system font = exactly what WhatsApp uses (SF Pro on iOS, Roboto on Android). Cairo is the Arabic fallback. */
+    --wa-font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", "Segoe UI", Roboto, system-ui, "Cairo", sans-serif;
+  }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   html, body { height: 100%; }
   body {
-    font-family: 'Cairo', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: var(--wa-font);
     background: #0b141a; color: #111b21;
     -webkit-font-smoothing: antialiased;
     display: flex; justify-content: center;
@@ -28,33 +33,33 @@
   /* header */
   .wa-header {
     flex-shrink: 0; background: #075E54; color: #fff;
-    display: flex; align-items: center; gap: 10px;
-    padding: 10px 12px; padding-top: max(10px, env(safe-area-inset-top));
+    display: flex; align-items: center; gap: 9px;
+    padding: 9px 12px; padding-top: max(9px, env(safe-area-inset-top));
   }
-  .wa-back { font-size: 24px; line-height: 1; opacity: 0.95; width: 16px; }
+  .wa-back { font-size: 26px; line-height: 1; opacity: 0.95; width: 14px; font-weight: 300; }
   .wa-avatar {
-    width: 40px; height: 40px; border-radius: 50%;
+    width: 38px; height: 38px; border-radius: 50%;
     background: #c9d6cf; color: #075E54;
     display: flex; align-items: center; justify-content: center;
-    font-weight: 700; font-size: 18px; flex-shrink: 0;
+    font-weight: 600; font-size: 17px; flex-shrink: 0;
   }
   .wa-meta { flex: 1; min-width: 0; }
-  .wa-name { font-weight: 700; font-size: 16px; line-height: 1.2; }
-  .wa-status { font-size: 12px; opacity: 0.85; line-height: 1.3; }
-  .wa-icons { display: flex; gap: 18px; align-items: center; }
+  .wa-name { font-weight: 600; font-size: 17px; line-height: 1.2; letter-spacing: -0.01em; }
+  .wa-status { font-size: 13px; opacity: 0.8; line-height: 1.3; }
+  .wa-icons { display: flex; gap: 20px; align-items: center; }
   .wa-icons svg { width: 21px; height: 21px; }
 
   /* language toggle */
   .lang-toggle {
-    position: absolute; top: calc(max(10px, env(safe-area-inset-top)) + 64px);
+    position: absolute; top: calc(max(9px, env(safe-area-inset-top)) + 62px);
     inset-inline-end: 12px;
-    display: flex; background: rgba(0,0,0,0.55); border-radius: 999px;
-    padding: 3px; z-index: 50; backdrop-filter: blur(4px);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    display: flex; background: rgba(0,0,0,0.5); border-radius: 999px;
+    padding: 3px; z-index: 50; -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.22);
   }
   .lang-opt {
     border: none; background: transparent; color: rgba(255,255,255,0.7);
-    font-family: inherit; font-weight: 700; font-size: 13px;
+    font-family: var(--wa-font); font-weight: 700; font-size: 13px;
     padding: 5px 12px; border-radius: 999px; cursor: pointer; line-height: 1;
     transition: all 120ms;
   }
@@ -62,90 +67,93 @@
 
   /* chat */
   .chat {
-    flex: 1; overflow-y: auto; padding: 14px 10px 6px;
+    flex: 1; overflow-y: auto; padding: 14px 14px 10px;
     background-color: #efeae2;
     background-image:
       radial-gradient(circle at 20% 30%, rgba(0,0,0,0.018) 0 2px, transparent 2px),
       radial-gradient(circle at 70% 60%, rgba(0,0,0,0.018) 0 2px, transparent 2px),
       radial-gradient(circle at 45% 85%, rgba(0,0,0,0.015) 0 2px, transparent 2px);
     background-size: 140px 140px;
-    display: flex; flex-direction: column; gap: 8px;
+    display: flex; flex-direction: column; gap: 10px;
   }
   .date-pill {
     align-self: center; background: #fff; color: #54656f;
-    font-size: 12px; font-weight: 600; padding: 5px 12px;
-    border-radius: 8px; box-shadow: 0 1px 0.5px rgba(0,0,0,0.08); margin-bottom: 4px;
+    font-size: 12.5px; font-weight: 500; padding: 5px 12px;
+    border-radius: 7px; box-shadow: 0 1px 0.5px rgba(0,0,0,0.08); margin-bottom: 2px;
   }
   .enc-note {
-    align-self: center; background: #fdf4c5; color: #54656f;
-    font-size: 11px; text-align: center; padding: 6px 12px;
-    border-radius: 8px; max-width: 88%; line-height: 1.5;
-    box-shadow: 0 1px 0.5px rgba(0,0,0,0.06); margin-bottom: 2px;
+    align-self: center; background: #ffeeca; color: #54656f;
+    font-size: 12px; text-align: center; padding: 6px 14px;
+    border-radius: 7px; max-width: 90%; line-height: 1.5;
+    box-shadow: 0 1px 0.5px rgba(0,0,0,0.06);
   }
+
+  /* the single message: a receipt card bubble */
   .bubble {
-    align-self: flex-start; background: #fff;
-    border-radius: 8px; border-top-left-radius: 0;
-    box-shadow: 0 1px 0.5px rgba(0,0,0,0.13); position: relative; padding: 7px 9px 5px;
+    align-self: flex-start;
+    background: #fff;
+    width: 86%;
+    border-radius: 12px; border-top-left-radius: 3px;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.13);
+    position: relative;
+    overflow: hidden;
   }
   .bubble::before {
-    content: ""; position: absolute; top: 0; left: -8px;
-    width: 8px; height: 13px; background: #fff;
-    clip-path: polygon(100% 0, 0 0, 100% 100%);
+    content: ""; position: absolute; top: 0; left: -7px;
+    width: 9px; height: 12px; background: #fff;
+    clip-path: polygon(100% 0, 0 0, 100% 45%);
   }
-  .bubble.greeting { max-width: 84%; }
-  .bubble.bill { width: 92%; padding: 5px; }
-  .msg-text { font-size: 14px; line-height: 1.55; color: #111b21; text-align: start; padding: 2px 4px; }
-  .msg-time { font-size: 11px; color: #667781; text-align: end; margin-top: 2px; padding: 0 2px; }
 
-  /* receipt */
-  .receipt { text-align: start; background: #fff; border-radius: 6px; overflow: hidden; }
-  .r-head { background: #f0f2f5; padding: 12px 14px; border-bottom: 1px solid #e4e8eb; }
-  .r-brand { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .receipt { text-align: start; }
+  .r-head { background: #f0f2f5; padding: 13px 14px; }
+  .r-brand { display: flex; align-items: center; gap: 9px; margin-bottom: 8px; }
   .r-bolt {
-    width: 26px; height: 26px; border-radius: 7px; background: #075E54; color: #fff;
+    width: 28px; height: 28px; border-radius: 8px; background: #075E54; color: #fff;
     display: flex; align-items: center; justify-content: center; flex-shrink: 0;
   }
-  .r-bolt svg { width: 15px; height: 15px; }
-  .r-brand-name { font-weight: 800; font-size: 15px; color: #111b21; }
-  .r-doc { font-size: 12.5px; color: #54656f; font-weight: 600; }
-  .r-sub { display: flex; justify-content: space-between; font-size: 12px; color: #54656f; margin-top: 8px; }
-  .r-sub b { color: #111b21; font-weight: 700; }
-  .r-body { padding: 12px 14px; }
-  .r-section-label { font-size: 11px; color: #8696a0; font-weight: 700; margin: 2px 0 6px; }
-  .r-row { display: flex; justify-content: space-between; align-items: baseline; padding: 5px 0; font-size: 13.5px; }
+  .r-bolt svg { width: 16px; height: 16px; }
+  .r-brand-name { font-weight: 700; font-size: 15px; color: #111b21; }
+  .r-doc { font-size: 12.5px; color: #667781; font-weight: 400; }
+  .r-sub { display: flex; justify-content: space-between; font-size: 12.5px; color: #667781; }
+  .r-sub b { color: #111b21; font-weight: 600; }
+  .r-body { padding: 12px 14px 6px; }
+  .r-section-label { font-size: 11px; color: #8696a0; font-weight: 600; letter-spacing: 0.03em; margin: 2px 0 4px; }
+  .r-row { display: flex; justify-content: space-between; align-items: baseline; padding: 5px 0; font-size: 14px; }
   .r-row .lbl { color: #54656f; }
-  .r-row .val { font-weight: 700; color: #111b21; unicode-bidi: plaintext; }
-  .r-row .val .unit { font-weight: 600; color: #8696a0; font-size: 12px; margin-inline-start: 3px; }
-  .r-divider { height: 1px; background: #e9edef; margin: 8px 0; }
-  .r-payable { background: #f6f9f8; border: 1px solid #d8e6e0; border-radius: 8px; padding: 12px 14px; margin-top: 10px; }
-  .r-payable-lbl { font-size: 12px; color: #54656f; font-weight: 700; margin-bottom: 4px; }
-  .r-payable-lbp { font-size: 24px; font-weight: 800; color: #111b21; line-height: 1.15; unicode-bidi: plaintext; }
-  .r-payable-lbp .unit { font-size: 15px; font-weight: 700; color: #54656f; margin-inline-start: 4px; }
-  .r-payable-usd { font-size: 14px; font-weight: 700; color: #075E54; margin-top: 3px; unicode-bidi: plaintext; }
-  .r-payable-usd .eq { color: #8696a0; font-weight: 600; }
-  .whish { margin-top: 10px; border: 1px solid #e9edef; border-radius: 8px; padding: 12px; text-align: center; }
-  .whish-title { font-size: 12.5px; font-weight: 700; color: #54656f; margin-bottom: 8px; }
+  .r-row .val { font-weight: 600; color: #111b21; unicode-bidi: plaintext; }
+  .r-row .val .unit { font-weight: 400; color: #8696a0; font-size: 12px; margin-inline-start: 3px; }
+  .r-divider { height: 1px; background: #eceff1; margin: 8px 0; }
+  .r-payable { background: #f6f9f8; border: 1px solid #d8e6e0; border-radius: 9px; padding: 12px 14px; margin-top: 10px; }
+  .r-payable-lbl { font-size: 12px; color: #54656f; font-weight: 600; margin-bottom: 4px; }
+  .r-payable-lbp { font-size: 24px; font-weight: 700; color: #111b21; line-height: 1.15; unicode-bidi: plaintext; }
+  .r-payable-lbp .unit { font-size: 15px; font-weight: 600; color: #54656f; margin-inline-start: 4px; }
+  .r-payable-usd { font-size: 14px; font-weight: 600; color: #075E54; margin-top: 3px; unicode-bidi: plaintext; }
+  .r-payable-usd .eq { color: #8696a0; font-weight: 400; }
+  .whish { margin-top: 10px; border: 1px solid #e9edef; border-radius: 9px; padding: 12px; text-align: center; }
+  .whish-title { font-size: 12.5px; font-weight: 600; color: #54656f; margin-bottom: 8px; }
   .whish-title b { color: #E4163C; }
-  .qr { width: 116px; height: 116px; margin: 0 auto 8px; background: #fff; border: 1px solid #eceff1; border-radius: 6px; padding: 7px; }
+  .qr { width: 112px; height: 112px; margin: 0 auto 8px; background: #fff; border: 1px solid #eceff1; border-radius: 6px; padding: 7px; }
   .qr svg { width: 100%; height: 100%; display: block; }
   .whish-hint { font-size: 11px; color: #8696a0; margin-bottom: 10px; }
   .whish-btn {
     display: flex; align-items: center; justify-content: center; gap: 8px;
     background: #E4163C; color: #fff; border: none; border-radius: 9px;
-    padding: 11px; width: 100%; font-family: inherit; font-size: 14px; font-weight: 700;
+    padding: 12px; width: 100%; font-family: var(--wa-font); font-size: 14px; font-weight: 600;
     cursor: pointer; unicode-bidi: plaintext;
   }
   .whish-btn .wmark { background: #fff; color: #E4163C; font-weight: 800; border-radius: 4px; padding: 1px 5px; font-size: 12px; }
-  .r-foot { font-size: 11px; color: #8696a0; text-align: center; padding: 10px 14px 4px; line-height: 1.5; border-top: 1px solid #f0f2f5; margin-top: 10px; }
-  .bill .msg-time { padding: 4px 6px 2px; }
+  .r-foot { font-size: 11.5px; color: #8696a0; text-align: center; padding: 11px 14px 2px; line-height: 1.5; }
+
+  /* timestamp inside the card */
+  .msg-time { font-size: 11px; color: #667781; text-align: end; padding: 2px 12px 8px; }
 
   /* input */
   .wa-input {
     flex-shrink: 0; display: flex; align-items: center; gap: 8px;
     padding: 7px 10px; padding-bottom: max(7px, env(safe-area-inset-bottom)); background: #f0f2f5;
   }
-  .wa-field { flex: 1; background: #fff; border-radius: 22px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; color: #8696a0; font-size: 14px; text-align: start; }
-  .wa-field svg { width: 20px; height: 20px; color: #8696a0; flex-shrink: 0; }
+  .wa-field { flex: 1; background: #fff; border-radius: 22px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; color: #8696a0; font-size: 15px; text-align: start; }
+  .wa-field svg { width: 21px; height: 21px; color: #8696a0; flex-shrink: 0; }
   .wa-field .ph { flex: 1; }
   .wa-mic { width: 44px; height: 44px; border-radius: 50%; background: #075E54; color: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .wa-mic svg { width: 21px; height: 21px; }
@@ -176,12 +184,8 @@
     <div class="date-pill" data-k="datePill"></div>
     <div class="enc-note" data-k="enc"></div>
 
-    <div class="bubble greeting">
-      <div class="msg-text" id="greeting"></div>
-      <div class="msg-time" data-k="time"></div>
-    </div>
-
-    <div class="bubble bill">
+    <!-- ONE message: the receipt (no separate greeting — avoids a 2nd billable WhatsApp message) -->
+    <div class="bubble">
       <div class="receipt" id="receipt">
         <div class="r-head">
           <div class="r-brand">
@@ -248,7 +252,6 @@
       name: 'مولّد الحي', status: 'حساب أعمال',
       datePill: 'اليوم',
       enc: '🔒 الرسائل والمكالمات مشفّرة بالكامل من طرف إلى طرف',
-      greeting: 'مرحباً 👋<br>إليك فاتورة الاشتراك لشهر تشرين الثاني 2026. يرجى التسديد قبل الرابع من الشهر. شكراً.',
       time: '8:14 ص',
       brandName: 'مولّد الحي',
       doc: 'فاتورة كهرباء · تشرين الثاني 2026',
@@ -261,8 +264,8 @@
       payableLabel: 'المبلغ المستحق', eq: 'يعادل',
       whishTitle: 'الدفع عبر <b>Whish</b>',
       whishHint: 'امسح الرمز أو اضغط للدفع',
-      payBtn: 'ادفع 3,092,926 ل.ل',
-      foot: 'يرجى الاحتفاظ بالإيصال · للاستفسار راسلنا على هذا الرقم',
+      payBtn: 'ادفع $34.56',
+      foot: 'يرجى التسديد قبل الرابع من الشهر · احتفظ بالإيصال',
       inputPh: 'رسالة',
       kwh: 'ك.و.س', lbp: 'ل.ل'
     },
@@ -271,7 +274,6 @@
       name: 'Moteur Central', status: 'Business account',
       datePill: 'Today',
       enc: '🔒 Messages and calls are end-to-end encrypted',
-      greeting: 'Hello 👋<br>Here is your subscription bill for November 2026. Kindly settle before the 4th of the month. Thank you.',
       time: '8:14 AM',
       brandName: 'Moteur Central',
       doc: 'Electricity bill · November 2026',
@@ -284,40 +286,29 @@
       payableLabel: 'Amount due', eq: 'equivalent to',
       whishTitle: 'Pay with <b>Whish</b>',
       whishHint: 'Scan the code or tap to pay',
-      payBtn: 'Pay 3,092,926 LBP',
-      foot: 'Please keep this receipt · For any question, reply to this number',
+      payBtn: 'Pay $34.56',
+      foot: 'Kindly settle before the 4th · Keep this receipt',
       inputPh: 'Message',
       kwh: 'kWh', lbp: 'LBP'
     }
   };
 
-  const dirTargets = ['greeting', 'receipt', 'field'];
+  const dirTargets = ['receipt', 'field'];
 
   function setLang(lang) {
     const t = T[lang];
     document.documentElement.lang = lang;
     document.getElementById('avatar').textContent = t.avatar;
-    // plain text keys
-    document.querySelectorAll('[data-k]').forEach(el => {
-      el.textContent = t[el.getAttribute('data-k')];
-    });
-    // units
-    document.querySelectorAll('[data-u]').forEach(el => {
-      el.textContent = el.getAttribute('data-u') === 'kwh' ? t.kwh : t.lbp;
-    });
-    // html bits
-    document.getElementById('greeting').innerHTML = t.greeting;
+    document.querySelectorAll('[data-k]').forEach(el => { el.textContent = t[el.getAttribute('data-k')]; });
+    document.querySelectorAll('[data-u]').forEach(el => { el.textContent = el.getAttribute('data-u') === 'kwh' ? t.kwh : t.lbp; });
     document.getElementById('whishTitle').innerHTML = t.whishTitle;
     document.getElementById('payBtnTxt').textContent = t.payBtn;
-    // direction
     dirTargets.forEach(id => document.getElementById(id).setAttribute('dir', t.dir));
     document.querySelectorAll('.msg-time').forEach(el => el.setAttribute('dir', t.dir));
-    // toggle state
     document.getElementById('btnAr').classList.toggle('active', lang === 'ar');
     document.getElementById('btnEn').classList.toggle('active', lang === 'en');
   }
 
-  // QR placeholder (encodes nothing — visual only)
   (function () {
     const N = 29, svg = document.getElementById('qr');
     let seed = 1337;
@@ -346,7 +337,7 @@
     svg.innerHTML = rects;
   })();
 
-  setLang('ar'); // default to Arabic (the realistic bill)
+  setLang('ar');
 </script>
 </body>
 </html>
