@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#075E54">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="فاتورة Whish">
+<title>فاتورة عبر واتساب · Bill via WhatsApp</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; }
+  body {
+    font-family: 'Cairo', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #0b141a; color: #111b21;
+    -webkit-font-smoothing: antialiased;
+    display: flex; justify-content: center;
+  }
+  .phone {
+    width: 100%; max-width: 420px; height: 100vh; height: 100dvh;
+    display: flex; flex-direction: column; background: #efeae2;
+    position: relative; overflow: hidden;
+  }
+
+  /* header */
+  .wa-header {
+    flex-shrink: 0; background: #075E54; color: #fff;
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; padding-top: max(10px, env(safe-area-inset-top));
+  }
+  .wa-back { font-size: 24px; line-height: 1; opacity: 0.95; width: 16px; }
+  .wa-avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: #c9d6cf; color: #075E54;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 18px; flex-shrink: 0;
+  }
+  .wa-meta { flex: 1; min-width: 0; }
+  .wa-name { font-weight: 700; font-size: 16px; line-height: 1.2; }
+  .wa-status { font-size: 12px; opacity: 0.85; line-height: 1.3; }
+  .wa-icons { display: flex; gap: 18px; align-items: center; }
+  .wa-icons svg { width: 21px; height: 21px; }
+
+  /* language toggle */
+  .lang-toggle {
+    position: absolute; top: calc(max(10px, env(safe-area-inset-top)) + 64px);
+    inset-inline-end: 12px;
+    display: flex; background: rgba(0,0,0,0.55); border-radius: 999px;
+    padding: 3px; z-index: 50; backdrop-filter: blur(4px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  }
+  .lang-opt {
+    border: none; background: transparent; color: rgba(255,255,255,0.7);
+    font-family: inherit; font-weight: 700; font-size: 13px;
+    padding: 5px 12px; border-radius: 999px; cursor: pointer; line-height: 1;
+    transition: all 120ms;
+  }
+  .lang-opt.active { background: #fff; color: #075E54; }
+
+  /* chat */
+  .chat {
+    flex: 1; overflow-y: auto; padding: 14px 10px 6px;
+    background-color: #efeae2;
+    background-image:
+      radial-gradient(circle at 20% 30%, rgba(0,0,0,0.018) 0 2px, transparent 2px),
+      radial-gradient(circle at 70% 60%, rgba(0,0,0,0.018) 0 2px, transparent 2px),
+      radial-gradient(circle at 45% 85%, rgba(0,0,0,0.015) 0 2px, transparent 2px);
+    background-size: 140px 140px;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .date-pill {
+    align-self: center; background: #fff; color: #54656f;
+    font-size: 12px; font-weight: 600; padding: 5px 12px;
+    border-radius: 8px; box-shadow: 0 1px 0.5px rgba(0,0,0,0.08); margin-bottom: 4px;
+  }
+  .enc-note {
+    align-self: center; background: #fdf4c5; color: #54656f;
+    font-size: 11px; text-align: center; padding: 6px 12px;
+    border-radius: 8px; max-width: 88%; line-height: 1.5;
+    box-shadow: 0 1px 0.5px rgba(0,0,0,0.06); margin-bottom: 2px;
+  }
+  .bubble {
+    align-self: flex-start; background: #fff;
+    border-radius: 8px; border-top-left-radius: 0;
+    box-shadow: 0 1px 0.5px rgba(0,0,0,0.13); position: relative; padding: 7px 9px 5px;
+  }
+  .bubble::before {
+    content: ""; position: absolute; top: 0; left: -8px;
+    width: 8px; height: 13px; background: #fff;
+    clip-path: polygon(100% 0, 0 0, 100% 100%);
+  }
+  .bubble.greeting { max-width: 84%; }
+  .bubble.bill { width: 92%; padding: 5px; }
+  .msg-text { font-size: 14px; line-height: 1.55; color: #111b21; text-align: start; padding: 2px 4px; }
+  .msg-time { font-size: 11px; color: #667781; text-align: end; margin-top: 2px; padding: 0 2px; }
+
+  /* receipt */
+  .receipt { text-align: start; background: #fff; border-radius: 6px; overflow: hidden; }
+  .r-head { background: #f0f2f5; padding: 12px 14px; border-bottom: 1px solid #e4e8eb; }
+  .r-brand { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .r-bolt {
+    width: 26px; height: 26px; border-radius: 7px; background: #075E54; color: #fff;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .r-bolt svg { width: 15px; height: 15px; }
+  .r-brand-name { font-weight: 800; font-size: 15px; color: #111b21; }
+  .r-doc { font-size: 12.5px; color: #54656f; font-weight: 600; }
+  .r-sub { display: flex; justify-content: space-between; font-size: 12px; color: #54656f; margin-top: 8px; }
+  .r-sub b { color: #111b21; font-weight: 700; }
+  .r-body { padding: 12px 14px; }
+  .r-section-label { font-size: 11px; color: #8696a0; font-weight: 700; margin: 2px 0 6px; }
+  .r-row { display: flex; justify-content: space-between; align-items: baseline; padding: 5px 0; font-size: 13.5px; }
+  .r-row .lbl { color: #54656f; }
+  .r-row .val { font-weight: 700; color: #111b21; unicode-bidi: plaintext; }
+  .r-row .val .unit { font-weight: 600; color: #8696a0; font-size: 12px; margin-inline-start: 3px; }
+  .r-divider { height: 1px; background: #e9edef; margin: 8px 0; }
+  .r-payable { background: #f6f9f8; border: 1px solid #d8e6e0; border-radius: 8px; padding: 12px 14px; margin-top: 10px; }
+  .r-payable-lbl { font-size: 12px; color: #54656f; font-weight: 700; margin-bottom: 4px; }
+  .r-payable-lbp { font-size: 24px; font-weight: 800; color: #111b21; line-height: 1.15; unicode-bidi: plaintext; }
+  .r-payable-lbp .unit { font-size: 15px; font-weight: 700; color: #54656f; margin-inline-start: 4px; }
+  .r-payable-usd { font-size: 14px; font-weight: 700; color: #075E54; margin-top: 3px; unicode-bidi: plaintext; }
+  .r-payable-usd .eq { color: #8696a0; font-weight: 600; }
+  .whish { margin-top: 10px; border: 1px solid #e9edef; border-radius: 8px; padding: 12px; text-align: center; }
+  .whish-title { font-size: 12.5px; font-weight: 700; color: #54656f; margin-bottom: 8px; }
+  .whish-title b { color: #E4163C; }
+  .qr { width: 116px; height: 116px; margin: 0 auto 8px; background: #fff; border: 1px solid #eceff1; border-radius: 6px; padding: 7px; }
+  .qr svg { width: 100%; height: 100%; display: block; }
+  .whish-hint { font-size: 11px; color: #8696a0; margin-bottom: 10px; }
+  .whish-btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    background: #E4163C; color: #fff; border: none; border-radius: 9px;
+    padding: 11px; width: 100%; font-family: inherit; font-size: 14px; font-weight: 700;
+    cursor: pointer; unicode-bidi: plaintext;
+  }
+  .whish-btn .wmark { background: #fff; color: #E4163C; font-weight: 800; border-radius: 4px; padding: 1px 5px; font-size: 12px; }
+  .r-foot { font-size: 11px; color: #8696a0; text-align: center; padding: 10px 14px 4px; line-height: 1.5; border-top: 1px solid #f0f2f5; margin-top: 10px; }
+  .bill .msg-time { padding: 4px 6px 2px; }
+
+  /* input */
+  .wa-input {
+    flex-shrink: 0; display: flex; align-items: center; gap: 8px;
+    padding: 7px 10px; padding-bottom: max(7px, env(safe-area-inset-bottom)); background: #f0f2f5;
+  }
+  .wa-field { flex: 1; background: #fff; border-radius: 22px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; color: #8696a0; font-size: 14px; text-align: start; }
+  .wa-field svg { width: 20px; height: 20px; color: #8696a0; flex-shrink: 0; }
+  .wa-field .ph { flex: 1; }
+  .wa-mic { width: 44px; height: 44px; border-radius: 50%; background: #075E54; color: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .wa-mic svg { width: 21px; height: 21px; }
+</style>
+</head>
+<body>
+<div class="phone">
+
+  <div class="wa-header">
+    <div class="wa-back">‹</div>
+    <div class="wa-avatar" id="avatar">م</div>
+    <div class="wa-meta">
+      <div class="wa-name" data-k="name"></div>
+      <div class="wa-status" data-k="status"></div>
+    </div>
+    <div class="wa-icons">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 10.5V7a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-3.5l4 4v-11l-4 4z"/></svg>
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 15.5c-1.2 0-2.5-.2-3.6-.6a1 1 0 0 0-1 .2l-2.2 2.2a15 15 0 0 1-6.6-6.6l2.2-2.2a1 1 0 0 0 .2-1C8.7 6.5 8.5 5.2 8.5 4a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1 17 17 0 0 0 17 17 1 1 0 0 0 1-1v-3.5a1 1 0 0 0-1-1z"/></svg>
+    </div>
+  </div>
+
+  <div class="lang-toggle">
+    <button class="lang-opt" id="btnAr" onclick="setLang('ar')">ع</button>
+    <button class="lang-opt" id="btnEn" onclick="setLang('en')">EN</button>
+  </div>
+
+  <div class="chat" id="chat">
+    <div class="date-pill" data-k="datePill"></div>
+    <div class="enc-note" data-k="enc"></div>
+
+    <div class="bubble greeting">
+      <div class="msg-text" id="greeting"></div>
+      <div class="msg-time" data-k="time"></div>
+    </div>
+
+    <div class="bubble bill">
+      <div class="receipt" id="receipt">
+        <div class="r-head">
+          <div class="r-brand">
+            <div class="r-bolt"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L4.5 13.5H11l-1 8.5L19.5 10H13z"/></svg></div>
+            <div>
+              <div class="r-brand-name" data-k="brandName"></div>
+              <div class="r-doc" data-k="doc"></div>
+            </div>
+          </div>
+          <div class="r-sub"><span data-k="meterLabel"></span><b>PAF 013391</b></div>
+        </div>
+
+        <div class="r-body">
+          <div class="r-section-label" data-k="secReading"></div>
+          <div class="r-row"><span class="lbl" data-k="prevLabel"></span><span class="val">1,103 <span class="unit" data-u="kwh"></span></span></div>
+          <div class="r-row"><span class="lbl" data-k="currLabel"></span><span class="val">1,173 <span class="unit" data-u="kwh"></span></span></div>
+          <div class="r-row"><span class="lbl" data-k="consLabel"></span><span class="val">70 <span class="unit" data-u="kwh"></span></span></div>
+
+          <div class="r-divider"></div>
+
+          <div class="r-section-label" data-k="secCharges"></div>
+          <div class="r-row"><span class="lbl" data-k="rateLabel"></span><span class="val">34,306 <span class="unit" data-u="lbp"></span></span></div>
+          <div class="r-row"><span class="lbl" data-k="consChargeLabel"></span><span class="val">2,401,420 <span class="unit" data-u="lbp"></span></span></div>
+          <div class="r-row"><span class="lbl" data-k="feeLabel"></span><span class="val">385,000 <span class="unit" data-u="lbp"></span></span></div>
+          <div class="r-row"><span class="lbl" data-k="subtotalLabel"></span><span class="val">$31.13</span></div>
+          <div class="r-row"><span class="lbl" data-k="vatLabel"></span><span class="val">306,506 <span class="unit" data-u="lbp"></span></span></div>
+
+          <div class="r-payable">
+            <div class="r-payable-lbl" data-k="payableLabel"></div>
+            <div class="r-payable-lbp">3,092,926 <span class="unit" data-u="lbp"></span></div>
+            <div class="r-payable-usd"><span class="eq" data-k="eq"></span> $34.56</div>
+          </div>
+
+          <div class="whish">
+            <div class="whish-title" id="whishTitle"></div>
+            <div class="qr"><svg id="qr" viewBox="0 0 29 29" shape-rendering="crispEdges"></svg></div>
+            <div class="whish-hint" data-k="whishHint"></div>
+            <button class="whish-btn"><span class="wmark">W</span><span id="payBtnTxt"></span></button>
+          </div>
+
+          <div class="r-foot" data-k="foot"></div>
+        </div>
+      </div>
+      <div class="msg-time" data-k="time"></div>
+    </div>
+  </div>
+
+  <div class="wa-input">
+    <div class="wa-field" id="field">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+      <span class="ph" data-k="inputPh"></span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+    </div>
+    <div class="wa-mic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3z"/><path d="M19 11a7 7 0 0 1-14 0H3a9 9 0 0 0 8 8.94V23h2v-3.06A9 9 0 0 0 21 11z"/></svg></div>
+  </div>
+
+</div>
+
+<script>
+  const T = {
+    ar: {
+      dir: 'rtl', avatar: 'م',
+      name: 'مولّد الحي', status: 'حساب أعمال',
+      datePill: 'اليوم',
+      enc: '🔒 الرسائل والمكالمات مشفّرة بالكامل من طرف إلى طرف',
+      greeting: 'مرحباً 👋<br>إليك فاتورة الاشتراك لشهر تشرين الثاني 2026. يرجى التسديد قبل الرابع من الشهر. شكراً.',
+      time: '8:14 ص',
+      brandName: 'مولّد الحي',
+      doc: 'فاتورة كهرباء · تشرين الثاني 2026',
+      meterLabel: 'رقم العداد',
+      secReading: 'القراءة',
+      prevLabel: 'القراءة السابقة', currLabel: 'القراءة الحالية', consLabel: 'الاستهلاك',
+      secCharges: 'التفاصيل',
+      rateLabel: 'سعر الكيلوواط', consChargeLabel: 'قيمة الاستهلاك', feeLabel: 'رسم الاشتراك',
+      subtotalLabel: 'المجموع قبل الضريبة', vatLabel: 'ضريبة القيمة المضافة (11%)',
+      payableLabel: 'المبلغ المستحق', eq: 'يعادل',
+      whishTitle: 'الدفع عبر <b>Whish</b>',
+      whishHint: 'امسح الرمز أو اضغط للدفع',
+      payBtn: 'ادفع 3,092,926 ل.ل',
+      foot: 'يرجى الاحتفاظ بالإيصال · للاستفسار راسلنا على هذا الرقم',
+      inputPh: 'رسالة',
+      kwh: 'ك.و.س', lbp: 'ل.ل'
+    },
+    en: {
+      dir: 'ltr', avatar: 'M',
+      name: 'Moteur Central', status: 'Business account',
+      datePill: 'Today',
+      enc: '🔒 Messages and calls are end-to-end encrypted',
+      greeting: 'Hello 👋<br>Here is your subscription bill for November 2026. Kindly settle before the 4th of the month. Thank you.',
+      time: '8:14 AM',
+      brandName: 'Moteur Central',
+      doc: 'Electricity bill · November 2026',
+      meterLabel: 'Meter number',
+      secReading: 'METER READING',
+      prevLabel: 'Previous reading', currLabel: 'Current reading', consLabel: 'Consumption',
+      secCharges: 'CHARGES',
+      rateLabel: 'Rate per kWh', consChargeLabel: 'Consumption charge', feeLabel: 'Subscription fee',
+      subtotalLabel: 'Subtotal (before VAT)', vatLabel: 'VAT (11%)',
+      payableLabel: 'Amount due', eq: 'equivalent to',
+      whishTitle: 'Pay with <b>Whish</b>',
+      whishHint: 'Scan the code or tap to pay',
+      payBtn: 'Pay 3,092,926 LBP',
+      foot: 'Please keep this receipt · For any question, reply to this number',
+      inputPh: 'Message',
+      kwh: 'kWh', lbp: 'LBP'
+    }
+  };
+
+  const dirTargets = ['greeting', 'receipt', 'field'];
+
+  function setLang(lang) {
+    const t = T[lang];
+    document.documentElement.lang = lang;
+    document.getElementById('avatar').textContent = t.avatar;
+    // plain text keys
+    document.querySelectorAll('[data-k]').forEach(el => {
+      el.textContent = t[el.getAttribute('data-k')];
+    });
+    // units
+    document.querySelectorAll('[data-u]').forEach(el => {
+      el.textContent = el.getAttribute('data-u') === 'kwh' ? t.kwh : t.lbp;
+    });
+    // html bits
+    document.getElementById('greeting').innerHTML = t.greeting;
+    document.getElementById('whishTitle').innerHTML = t.whishTitle;
+    document.getElementById('payBtnTxt').textContent = t.payBtn;
+    // direction
+    dirTargets.forEach(id => document.getElementById(id).setAttribute('dir', t.dir));
+    document.querySelectorAll('.msg-time').forEach(el => el.setAttribute('dir', t.dir));
+    // toggle state
+    document.getElementById('btnAr').classList.toggle('active', lang === 'ar');
+    document.getElementById('btnEn').classList.toggle('active', lang === 'en');
+  }
+
+  // QR placeholder (encodes nothing — visual only)
+  (function () {
+    const N = 29, svg = document.getElementById('qr');
+    let seed = 1337;
+    const rnd = () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; };
+    const m = Array.from({length: N}, () => Array(N).fill(false));
+    function finder(r, c) {
+      for (let i = -1; i <= 7; i++) for (let j = -1; j <= 7; j++) {
+        const y = r + i, x = c + j;
+        if (y < 0 || x < 0 || y >= N || x >= N) continue;
+        const onB = (i === 0 || i === 6) && j >= 0 && j <= 6;
+        const onS = (j === 0 || j === 6) && i >= 0 && i <= 6;
+        const inn = i >= 2 && i <= 4 && j >= 2 && j <= 4;
+        m[y][x] = onB || onS || inn;
+      }
+    }
+    finder(0, 0); finder(0, N - 7); finder(N - 7, 0);
+    for (let i = 8; i < N - 8; i++) { m[6][i] = i % 2 === 0; m[i][6] = i % 2 === 0; }
+    for (let i = N - 9; i <= N - 5; i++) for (let j = N - 9; j <= N - 5; j++) {
+      const bi = i - (N - 9), bj = j - (N - 9);
+      m[i][j] = (bi === 0 || bi === 4 || bj === 0 || bj === 4 || (bi === 2 && bj === 2));
+    }
+    const isR = (y, x) => (y <= 8 && x <= 8) || (y <= 8 && x >= N - 8) || (y >= N - 8 && x <= 8) || (y === 6 || x === 6) || (y >= N - 9 && y <= N - 5 && x >= N - 9 && x <= N - 5);
+    for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) { if (!isR(y, x) && rnd() > 0.52) m[y][x] = true; }
+    let rects = '';
+    for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) { if (m[y][x]) rects += `<rect x="${x}" y="${y}" width="1" height="1" fill="#111b21"/>`; }
+    svg.innerHTML = rects;
+  })();
+
+  setLang('ar'); // default to Arabic (the realistic bill)
+</script>
+</body>
+</html>
